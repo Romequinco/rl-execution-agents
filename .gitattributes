@@ -1,0 +1,13 @@
+* text=auto
+
+# Un conflicto en un notebook conserva tu versión en vez de meter marcas que rompen el JSON
+*.ipynb -merge
+
+# Dos personas pueden añadir decisiones a la vez sin conflicto
+docs/DECISIONES.md merge=union
+
+# Datos binarios del taller
+*.pkl binary
+
+# El material de clase y las copias de los Talleres 1 y 2 no cuentan en las estadísticas de lenguaje de GitHub
+docs/raw/** linguist-vendored

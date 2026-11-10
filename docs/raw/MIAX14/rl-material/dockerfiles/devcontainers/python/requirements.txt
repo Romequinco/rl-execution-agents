@@ -1,0 +1,6 @@
+matplotlib==3.6.1
+jupyterlab==4.0.0
+pytest
+pytest-cov
+flake8
+pylint

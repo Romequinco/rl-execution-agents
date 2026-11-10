@@ -1,0 +1,20 @@
+FROM jesussanz/rl_material:v2
+COPY dockerfiles/devcontainers/python/requirements.txt /tmp/
+RUN set -ex; \
+    pip3 --no-cache-dir install --requirement /tmp/requirements.txt
+
+# FROM mcr.microsoft.com/vscode/devcontainers/python:3.8
+
+# COPY dockerfiles/devcontainers/python/requirements.txt /tmp/
+# RUN set -ex; \
+#     pip3 --no-cache-dir install --requirement /tmp/requirements.txt
+
+# RUN apt-get update -y && \ 
+#     apt-get install -y xvfb && \
+#     apt-get install -y python3-opengl 
+
+# RUN apt-get install -y swig
+
+# COPY src/rl/requirements.txt /tmp/
+# RUN set -ex; \
+#     pip3 --no-cache-dir install --requirement /tmp/requirements.txt

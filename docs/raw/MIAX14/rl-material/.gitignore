@@ -1,0 +1,15 @@
+
+**/.ipynb_checkpoints/
+
+*.pyc
+__pycache__/
+
+# pip install -e .
+*.egg-info/
+build/
+.venv/
+
+# Local certificates (corporate proxies)
+*.crt
+*.pem
+*.cer
