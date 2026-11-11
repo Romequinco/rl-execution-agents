@@ -35,7 +35,7 @@ libro de 13:00 a 17:25 (Santander y Repsol), y el punto de partida es el noteboo
 
 | Carpeta | Contenido |
 |---|---|
-| `docs/raw/` | Material del taller tal cual: transcripciones de las clases del 6 y 7 de noviembre (`26 11 06.pdf`, `26 11 07.pdf`) y `MIAX14/` (enunciado, teoría, `rl-material` y el repo `best-execution` con los datos) |
+| `docs/raw/` | Material del taller: `MIAX14/` con el enunciado, `rl-material` y el repo `best-execution` con los datos. Las transcripciones de las clases del 6 y 7 de noviembre (`26 11 06.pdf`, `26 11 07.pdf`) y las diapositivas (`applying_RL_MIAX.pdf`, `casos_practicos.pdf`) se citan en `docs/teoria` pero no se publican: se quedan en local por privacidad y derechos |
 | `docs/raw/MIAX14/best-execution/` | Repo del taller ([Oteo95/best-execution](https://github.com/Oteo95/best-execution), LGPL-2.1): `workshop/execution_lab.ipynb` y `data/*.pkl` |
 | `docs/raw/referencias/` | Copia de los Talleres 1 y 2 tal como están en GitHub, como referencia de estructura y decisiones |
 

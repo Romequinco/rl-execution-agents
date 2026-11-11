@@ -222,7 +222,7 @@ __marimo__/
 # ---------------------------------------------------------------
 # Proyecto rl-execution-agents
 # ---------------------------------------------------------------
-# docs/raw/ SÍ se versiona tal cual: material del taller (transcripciones, enunciado,
+# docs/raw/ se versiona (salvo transcripciones y diapositivas, al final): material del taller (enunciado,
 # teoría, repo best-execution con sus datos .pkl) y copias de los Talleres 1 y 2.
 # Se añadió con `git add -f docs/raw` para saltarse los .gitignore que trae dentro.
 
@@ -239,3 +239,9 @@ results/cache/
 !docs/raw/**/*.pkl
 
 .DS_Store
+
+# Transcripciones de clase y diapositivas del profesor: solo en local (privacidad y derechos)
+docs/raw/26 11 06.pdf
+docs/raw/26 11 07.pdf
+docs/raw/MIAX14/applying_RL_MIAX.pdf
+docs/raw/MIAX14/casos_practicos.pdf
