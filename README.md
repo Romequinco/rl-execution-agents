@@ -39,8 +39,29 @@ libro de 13:00 a 17:25 (Santander y Repsol), y el punto de partida es el noteboo
 | `docs/raw/MIAX14/best-execution/` | Repo del taller ([Oteo95/best-execution](https://github.com/Oteo95/best-execution), LGPL-2.1): `workshop/execution_lab.ipynb` y `data/*.pkl` |
 | `docs/raw/referencias/` | Copia de los Talleres 1 y 2 tal como están en GitHub, como referencia de estructura y decisiones |
 
-La síntesis del material en `docs/teoria/`, el registro de decisiones y los notebooks de la práctica se añadirán en las siguientes
-sesiones.
+## Síntesis del material (`docs/teoria/`)
+
+Todo lo visto en clase, con cada afirmación citada a su fuente (minuto de la transcripción, página de diapositiva o celda).
+Empezad por [`notebook_partida.md`](docs/teoria/notebook_partida.md).
+
+| Documento | Contenido |
+|---|---|
+| [`notebook_partida.md`](docs/teoria/notebook_partida.md) | Enunciado ejercicio a ejercicio, evaluación, logística y todo lo que dijo el profesor de la práctica |
+| [`00_repaso_rl.md`](docs/teoria/00_repaso_rl.md) | Componentes de RL, Markov, cuándo usar RL, TD, Q-learning, SARSA, Expected SARSA, Double Q |
+| [`01_aproximacion_funcional_y_dqn.md`](docs/teoria/01_aproximacion_funcional_y_dqn.md) | Aproximación lineal, DQN, replay (ER/PER/CER), target, Double, Dueling, papers de DeepMind |
+| [`02_diseno_de_entornos.md`](docs/teoria/02_diseno_de_entornos.md) | API gym/gymnasium, steps, estado, acciones, episodios, eficiencia y curriculum |
+| [`03_recompensas_y_descuento.md`](docs/teoria/03_recompensas_y_descuento.md) | Diseño y calibración de recompensas; cómo elegir γ según el horizonte |
+| [`04_exploracion_memoria_y_estabilidad.md`](docs/teoria/04_exploracion_memoria_y_estabilidad.md) | ε por mejora, α, buffer, catastrophic forgetting, checkpoints, semillas |
+| [`05_profit_seeking.md`](docs/teoria/05_profit_seeking.md) | RL para algoritmos de inversión |
+| [`06_algoritmos_de_ejecucion.md`](docs/teoria/06_algoritmos_de_ejecucion.md) | Orden CARE, dilema del trader, TWAP/VWAP/POV, VWAP slippage |
+| [`07_rl_para_ejecucion.md`](docs/teoria/07_rl_para_ejecucion.md) | Estado, acciones y recompensas de un agente de ejecución; resultados del TFM del profesor |
+| [`08_entorno_best_execution.md`](docs/teoria/08_entorno_best_execution.md) | El código del taller función a función, los datos y sus erratas |
+| [`09_material_rl_notebooks.md`](docs/teoria/09_material_rl_notebooks.md) | Los 18 notebooks de `rl-material` |
+| [`10_hoja_de_ruta_practica.md`](docs/teoria/10_hoja_de_ruta_practica.md) | Propuesta para abordar cada ejercicio, con opciones y riesgos |
+| [`11_glosario.md`](docs/teoria/11_glosario.md) | Términos de RL y de ejecución |
+| [`COBERTURA.md`](docs/teoria/COBERTURA.md) | Dónde quedó cada tramo, página y celda del material |
+
+Los notebooks de la práctica y el registro de decisiones se añadirán en las siguientes sesiones.
 
 ## Licencia
 
