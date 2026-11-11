@@ -10,10 +10,14 @@ from .protocol import FIGURES, trajectory
 ALGO, MKT, MID = "#D9822B", "#2B6CB0", "#C53030"
 
 
-def _save(fig, name):
+def save(fig, name):
+    """Guarda la figura en results/figures/<name>.png (crea la carpeta si no existe)."""
     if name:
         FIGURES.mkdir(parents=True, exist_ok=True)
         fig.savefig(FIGURES / f"{name}.png", dpi=130, bbox_inches="tight")
+
+
+_save = save
 
 
 def plot_results(env, title=None, mode="max", save=None):
