@@ -6,6 +6,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-CPU-EE4C2C?logo=pytorch&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-unittest-2F9E6E)
 ![Jupyter](https://img.shields.io/badge/Jupyter-notebooks-F37626?logo=jupyter&logoColor=white)
 ![Estado](https://img.shields.io/badge/estado-en%20curso-D69E2E)
 
@@ -30,6 +31,30 @@ libro de 13:00 a 17:25 (Santander y Repsol), y el punto de partida es el noteboo
 | 2 | 3,5 | Recompensa que replique un TWAP y ajuste motivado de los hiperparámetros |
 | 3 | 1,5 | Exploración (ε) que baje según la mejora del agente, no según el número de episodios |
 | 4 | 1,5 | Mejora libre: libro de órdenes, volumen pendiente y uso del ~90 % del tiempo, early stopping y checkpoints |
+
+## Notebooks
+
+| Notebook | Qué hace |
+|---|---|
+| [`00_datos_y_entorno`](notebooks/00_datos_y_entorno.ipynb) | Datos de Repsol, el entorno con sus 13 funciones, invariantes y referencias (TWAP determinista y aleatorio) |
+| [`ej1_execution_lab`](notebooks/ej1_execution_lab.ipynb) | Ej. 1: Double DQN entrena y ejecuta de principio a fin con la recompensa del taller |
+| [`ej2_twap_recompensas`](notebooks/ej2_twap_recompensas.ipynb) | Ej. 2: recompensa de seguimiento del plan, figuras en la rejilla y barridos de γ, buffer y frecuencia de aprendizaje |
+| [`ej3_exploracion`](notebooks/ej3_exploracion.ipynb) | Ej. 3: ε según la mejora medida frente al ε lineal |
+| [`ej4_extras`](notebooks/ej4_extras.ipynb) | Ej. 4: sin volumen pendiente y ~90 % de la duración (B); parada, checkpoints y recuperación (C) |
+
+El código está en [`notebooks/common/`](notebooks/common): `env.py` (entorno), `rewards.py`, `agents.py` (DDQN en PyTorch y
+TWAP), `exploration.py`, `protocol.py` (rejilla, métricas, bucle), `plots.py`, `data.py` y `test_env.py`. Las decisiones,
+con su justificación, están en [`docs/DECISIONES.md`](docs/DECISIONES.md).
+
+```bash
+pip install -r requirements.txt
+cd notebooks
+python -m unittest common.test_env -v
+jupyter lab
+```
+
+Los notebooks guardan CSV, figuras y modelos en `results/` y los reutilizan: si un resultado ya existe no se vuelve a
+entrenar (bórralo para recalcularlo). Con `RL_DATA=synthetic` usan datos sintéticos con el mismo esquema, solo para pruebas.
 
 ## Estructura
 
@@ -61,7 +86,7 @@ Empezad por [`notebook_partida.md`](docs/teoria/notebook_partida.md).
 | [`11_glosario.md`](docs/teoria/11_glosario.md) | Términos de RL y de ejecución |
 | [`COBERTURA.md`](docs/teoria/COBERTURA.md) | Dónde quedó cada tramo, página y celda del material |
 
-Los notebooks de la práctica y el registro de decisiones se añadirán en las siguientes sesiones.
+Los resultados de los ejercicios se añadirán cuando se ejecuten los notebooks con los datos reales.
 
 ## Licencia
 

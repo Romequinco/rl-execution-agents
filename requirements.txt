@@ -1,0 +1,6 @@
+torch>=2.2        # CPU basta
+numpy>=1.26
+pandas>=2.1       # los pickles de data/new_version/ son para pandas 2
+matplotlib>=3.8
+jupyterlab>=4
+nbconvert>=7      # ejecutar los notebooks desde la terminal
