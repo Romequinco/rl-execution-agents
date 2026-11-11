@@ -46,13 +46,13 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
   el resto del código propio es MIT.
 - **Estado:** CERRADA
 
-### D-0.5 · Pruebas con datos sintéticos
+### D-0.5 · Pruebas sobre los datos reales
 
 - **Fecha:** 2026-11-11
-- **Decisión:** `common/test_env.py` (16 pruebas) y la prueba de humo de los notebooks usan datos sintéticos con el mismo
-  esquema que los pickles (`RL_DATA=synthetic`). Los resultados de `results/` salen siempre de los datos reales.
-- **Justificación:** las invariantes del entorno no dependen de los precios, y así se pueden comprobar sin deserializar
-  pickles de terceros.
+- **Decisión:** `common/test_env.py` (16 pruebas) usa los días de train de REP. Nada de datos sintéticos.
+- **Justificación:** las invariantes se comprueban sobre los mismos datos que usan los notebooks. Los datos cumplen lo
+  supuesto: claves `datetime.date`, una fila cada 5 s de 13:00 a 17:25 (3.177-3.181 filas), sin NaN y `cumvol` nunca
+  decreciente; spread mediano 3,3 pb (un tick de 0,005 € sobre ~15 €).
 - **Estado:** CERRADA
 
 ---
@@ -117,9 +117,10 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
 - **Fecha:** 2026-11-11
 - **Decisión:** γ = 0,9, con barrido {0,9; 0,95; 0,99} × 3 semillas en el notebook.
 - **Justificación:** una compra afecta al error hasta la siguiente, unos N/n ≈ 10 pasos; con γ = 0,9 el horizonte efectivo
-  es de 10 pasos. **Evidencia preliminar (datos sintéticos, 300 episodios, 1 semilla):** γ = 0,9 replica el TWAP (error
-  máximo medio 0,97 títulos, igual que el determinista); γ = 0,95 se queda en 9,8 y γ = 0,99 en más de 20: con ~500 pasos los
-  Q-valores son grandes y la diferencia entre acciones queda enterrada.
+  es de 10 pasos. **Evidencia (REP train, rejilla de 27 órdenes, 300 episodios, semilla 0):** γ = 0,9 replica el TWAP
+  (error máximo medio 0,97 ± 0,11 títulos frente a 0,90 del determinista, termina en el 99 % del tiempo); γ = 0,95 se queda en
+  9,8 y γ = 0,99 en 34,8 y acaba al 30 % del tiempo: con ~500 pasos los Q-valores son grandes y la diferencia entre acciones
+  queda enterrada. Falta repetirlo con 3 semillas en el notebook.
 - **Estado:** ABIERTA (confirmar con el barrido sobre los datos reales)
 
 ### D-2.4 · Aprender cada 8 pasos y copiar la red objetivo cada 1.000
@@ -127,7 +128,8 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
 - **Fecha:** 2026-11-11
 - **Decisión:** `learn_after = 8`, `update_target_after = 1000` (el LAB usa 64 y 640).
 - **Justificación:** con 64 hay unas 8 actualizaciones por episodio y en 300 episodios el agente no llega a aprender la
-  frontera (evidencia sintética). El barrido {8, 64} queda en el notebook.
+  frontera: error máximo final 31,2 títulos frente a 0,97 con 8 (REP train, semilla 0). El barrido {8, 64} con 3 semillas
+  queda en el notebook.
 - **Estado:** ABIERTA
 
 ### D-2.5 · Buffer de 50.000 experiencias
@@ -148,8 +150,8 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
   $\varepsilon = \varepsilon_{max} - (\varepsilon_{max} - \varepsilon_{min})\,p_{ref}$ con $p_{ref}$ el mejor progreso. Si
   empeora más de 0,1 en 2 evaluaciones seguidas, $p_{ref}$ baja y ε sube (`exploration.ImprovementEpsilon`).
 - **Justificación:** responde a las dos preguntas del enunciado con una métrica y un benchmark explícitos, como pidió el
-  profesor (evaluar sin explorar, en varios episodios, contra un objetivo). **Evidencia preliminar (sintética):** alcanza el
-  error del TWAP hacia el episodio 200, frente al 250 del ε lineal.
+  profesor (evaluar sin explorar, en varios episodios, contra un objetivo). **Evidencia (REP train, semilla 0):** baja de 2 títulos en
+  el episodio 150, frente al 250 del ε lineal, y termina con 0,95 ± 0,07 frente a 0,97 ± 0,11.
 - **Estado:** ABIERTA (comparar con 3 semillas sobre los datos reales)
 
 ---

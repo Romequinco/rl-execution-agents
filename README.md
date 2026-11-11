@@ -54,7 +54,7 @@ jupyter lab
 ```
 
 Los notebooks guardan CSV, figuras y modelos en `results/` y los reutilizan: si un resultado ya existe no se vuelve a
-entrenar (bórralo para recalcularlo). Con `RL_DATA=synthetic` usan datos sintéticos con el mismo esquema, solo para pruebas.
+entrenar (bórralo para recalcularlo).
 
 ## Estructura
 

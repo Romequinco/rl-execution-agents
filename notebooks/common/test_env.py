@@ -1,11 +1,11 @@
 """Invariantes del entorno, las recompensas y los agentes.
 
-Usa datos sintéticos con el mismo esquema que rep_data.pkl (DataFrame cada 5 s de 13:00
-a 17:25 con ask1, bid1, vask1, vbid1, last, cumvol), así que no necesita los pickles.
-Ejecutar desde notebooks/:  python -m unittest common.test_env -v
+Usa los datos reales de Repsol (train). Ejecutar desde notebooks/:
+python -m unittest common.test_env -v
 """
 import tempfile
 import unittest
+from functools import lru_cache
 
 import numpy as np
 import pandas as pd
@@ -14,13 +14,24 @@ from . import exploration as ex
 from . import protocol as pr
 from . import rewards as rw
 from .agents import DDQNAgent, TWAPAgent
-from .data import synthetic_data
+from .data import load
 from .env import BestExecutionEnv
+
+
+@lru_cache(maxsize=1)
+def _train():
+    return load("REP")["train"]
+
+
+def real_data(n_days=None) -> dict:
+    """Días de train de REP (todos o los n_days primeros)."""
+    days = _train()
+    return days if n_days is None else {k: days[k] for k in list(days)[:n_days]}
 
 
 class TestEnv(unittest.TestCase):
     def setUp(self):
-        self.data = synthetic_data()
+        self.data = real_data(4)
         self.env = BestExecutionEnv(self.data, seed=1)
 
     def test_params_in_range(self):
@@ -89,7 +100,7 @@ class TestEnv(unittest.TestCase):
 
 class TestTWAP(unittest.TestCase):
     def test_deterministic_twap_tracks_plan(self):
-        data = synthetic_data()
+        data = real_data(4)
         env = BestExecutionEnv(data, seed=2)
         agent = TWAPAgent(env)
         for cfg in pr.make_grid(data, n_days=2, seed=3):
@@ -99,13 +110,13 @@ class TestTWAP(unittest.TestCase):
             self.assertLessEqual(m["max_err"], 1.0 + 1e-9, cfg)
 
     def test_twap_rule_reward_is_max_for_twap(self):
-        data = synthetic_data()
+        data = real_data(4)
         env = BestExecutionEnv(data, reward=rw.TWAPRule(), seed=4)
         ret = pr.run_episode(env, TWAPAgent(env))
         self.assertAlmostEqual(ret, len(env.vol_hist))
 
     def test_tracking_reward_bounds(self):
-        data = synthetic_data()
+        data = real_data(4)
         env = BestExecutionEnv(data, reward=rw.Tracking(clip=5, pending_penalty=0), seed=5)
         env.reset()
         rs = [env.step(0)[1] for _ in range(100)]
@@ -115,7 +126,7 @@ class TestTWAP(unittest.TestCase):
 
 class TestAgent(unittest.TestCase):
     def test_fill_learn_eval_checkpoint(self):
-        data = synthetic_data()
+        data = real_data(4)
         env = BestExecutionEnv(data, reward=rw.Tracking(), seed=6)
         agent = DDQNAgent(env, buffer_size=5000, seed=6)
         self.assertGreater(pr.fill_buffer(agent, env, n_episodes=3), 64)
@@ -136,7 +147,7 @@ class TestAgent(unittest.TestCase):
         self.assertTrue(set(res.columns) >= {"max_err", "completed", "t_fin"})
 
     def test_first_action_is_forced_buy(self):
-        data = synthetic_data()
+        data = real_data(4)
         env = BestExecutionEnv(data, seed=8)
         agent = DDQNAgent(env, epsilon=0.0, seed=8)
         s = env.reset()
