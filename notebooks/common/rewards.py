@@ -11,7 +11,6 @@ El plan TWAP que acaba en h·N pasos marca tras el paso t el objetivo
 """
 import numpy as np
 
-
 class Reward:
     name = "base"
 
@@ -45,6 +44,11 @@ class Default(Reward):
         if vol == 0:
             return 0.0
         return (env.episode_vwap - price) / env.episode_vwap
+
+
+
+        
+
 
 
 class TWAPRule(Reward):
