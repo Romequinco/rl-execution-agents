@@ -168,6 +168,24 @@ class TestExploration(unittest.TestCase):
         sched.on_eval(a, 8.0)              # segunda vez: ε vuelve a subir
         self.assertAlmostEqual(a.epsilon, 0.7)
 
+    def test_improvement_epsilon_fixed_base(self):
+        class A:
+            epsilon = 1.0
+        a, sched = A(), ex.ImprovementEpsilon(target_error=1.0, eps_max=1.0, eps_min=0.0, base_error=11.0)
+        sched.on_eval(a, 6.0)              # E0 fijo: la primera evaluación ya cuenta como progreso
+        self.assertAlmostEqual(a.epsilon, 0.5)
+        self.assertAlmostEqual(sched.base_error, 11.0)
+
+    def test_improvement_epsilon_log_scale(self):
+        class A:
+            epsilon = 1.0
+        a, sched = A(), ex.ImprovementEpsilon(target_error=1.0, eps_max=1.0, eps_min=0.0, base_error=100.0,
+                                              log_scale=True)
+        sched.on_eval(a, 10.0)             # mitad del camino en escala log (100 → 10 → 1)
+        self.assertAlmostEqual(a.epsilon, 0.5)
+        sched.on_eval(a, 0.5)              # mejor que el objetivo: p recortado a 1
+        self.assertAlmostEqual(a.epsilon, 0.0)
+
     def test_linear_decay(self):
         class A:
             epsilon = 1.0

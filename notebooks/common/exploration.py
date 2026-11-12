@@ -44,15 +44,23 @@ class ImprovementEpsilon:
     ``margin`` por debajo de progreso_ref, se rebaja progreso_ref al valor actual y ε vuelve
     a subir: el agente ha empeorado y necesita explorar otra vez. Entre evaluaciones ε no
     cambia, sea cual sea el número de episodios.
+
+    Variantes (ej. 3, Punto 5): ``base_error`` fija E0 de antemano (por ejemplo, el error de la
+    política «no comprar», = n medio de la rejilla) y la primera evaluación no se usa como
+    referencia; ``log_scale=True`` mide el progreso en escala logarítmica,
+    p = clip((ln E0 − ln E)/(ln E0 − ln E*), 0, 1), para que cada vez que el error se divide
+    por dos cuente lo mismo. Por defecto se mantiene el comportamiento original.
     """
 
-    def __init__(self, target_error, eps_max=1.0, eps_min=0.05, margin=0.1, patience=2):
+    def __init__(self, target_error, eps_max=1.0, eps_min=0.05, margin=0.1, patience=2,
+                 base_error=None, log_scale=False):
         self.target_error = target_error
         self.eps_max = eps_max
         self.eps_min = eps_min
         self.margin = margin
         self.patience = patience
-        self.base_error = None
+        self.base_error = None if base_error is None else max(base_error, target_error)
+        self.log_scale = log_scale
         self.best_progress = 0.0
         self._worse = 0
         self.history = []
@@ -64,10 +72,11 @@ class ImprovementEpsilon:
         pass
 
     def progress(self, error):
-        span = self.base_error - self.target_error
+        f = np.log if self.log_scale else (lambda x: x)
+        span = f(self.base_error) - f(self.target_error)
         if span <= 0:
             return 1.0
-        return float(np.clip((self.base_error - error) / span, 0.0, 1.0))
+        return float(np.clip((f(self.base_error) - f(max(error, 1e-12))) / span, 0.0, 1.0))
 
     def on_eval(self, agent, metric):
         if self.base_error is None:
@@ -79,5 +88,7 @@ class ImprovementEpsilon:
             self._worse += 1
             if self._worse >= self.patience:
                 self.best_progress, self._worse = p, 0
+        else:
+            self._worse = 0  # dentro del margen: la racha de empeoramientos se corta
         agent.epsilon = self.eps_max - (self.eps_max - self.eps_min) * self.best_progress
         self.history.append({"metric": metric, "progress": p, "ref": self.best_progress, "epsilon": agent.epsilon})

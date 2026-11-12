@@ -165,17 +165,62 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
 
 ## Bloque 3 · Ej. 3
 
-### D-3.1 · ε por mejora medida en evaluación greedy
+### D-3.1 · Métrica de mejora: error máximo de seguimiento en evaluación greedy
 
-- **Fecha:** 2026-11-11
-- **Decisión:** cada 25 episodios, evaluación greedy en la rejilla; métrica E = error máximo de seguimiento medio. Progreso
-  $p = \mathrm{clip}((E_0 - E)/(E_0 - E^*), 0, 1)$ entre la primera evaluación y el TWAP determinista;
-  $\varepsilon = \varepsilon_{max} - (\varepsilon_{max} - \varepsilon_{min})\,p_{ref}$ con $p_{ref}$ el mejor progreso. Si
-  empeora más de 0,1 en 2 evaluaciones seguidas, $p_{ref}$ baja y ε sube (`exploration.ImprovementEpsilon`).
-- **Justificación:** responde a las dos preguntas del enunciado con una métrica y un benchmark explícitos, como pidió el
-  profesor (evaluar sin explorar, en varios episodios, contra un objetivo). **Evidencia (REP train, semilla 0):** baja de 2 títulos en
-  el episodio 150, frente al 250 del ε lineal, y termina con 0,95 ± 0,07 frente a 0,97 ± 0,11.
-- **Estado:** ABIERTA (comparar con 3 semillas sobre los datos reales)
+- **Fecha:** 2026-11-12
+- **Decisión:** cada 25 episodios se evalúa la política greedy (sin ε ni aprendizaje) en los 27 episodios fijos de la
+  rejilla; E = error máximo de seguimiento medio, en títulos. Se registran además % completadas, títulos pendientes, t_fin y
+  slippage (informativo).
+- **Justificación:** la recompensa de entrenamiento va pegada a ε (correlación −0,85 con la config. final): mezcla política,
+  exploración y episodios de distinto N y n (T07 ~00:20-00:22). El slippage no separa políticas: la aleatoria gana al TWAP
+  en 11 de 27 episodios y completa el 48 %. El error medio diluye no terminar: una política que deja de comprar en el último
+  10 % da 0,63 de error medio (TWAP 0,44) y 4,78 de máximo (TWAP 0,90). La evaluación es determinista (mismos pesos → mismo
+  E), así que un salto de E es un cambio real de la política.
+- **Estado:** CERRADA
+
+### D-3.2 · Progreso entre E0 (primera evaluación) y E* (TWAP determinista)
+
+- **Fecha:** 2026-11-12
+- **Decisión:** $p = \mathrm{clip}((E_0 - E)/(E_0 - E^*), 0, 1)$ con E0 = primera evaluación del propio agente y E* = 0,90
+  (TWAP determinista en la rejilla). Alternativas: E0 = aleatoria (7,18) o «no comprar» (49,89, fijo).
+- **Justificación:** nivel de aspiración con un benchmark clásico (APP p.66): dice a qué distancia está el agente, no solo si
+  mejora. La aleatoria como E0 deja p = 0 aunque el agente aprenda. **Riesgo confirmado:** E0 varía mucho entre semillas
+  (config. final: 6,4-15,0; config. inestable: 29,9-48,9) y la primera evaluación da p = 0 por construcción, lo que mantiene
+  ε = 1 al menos 50 episodios.
+- **Revisión (punto 5):** se sustituye por **E0 fijo = 49,89** (política «no comprar», = n medio de la rejilla) y **progreso
+  en escala logarítmica**, $p = \mathrm{clip}((\ln E_0 - \ln E)/(\ln E_0 - \ln E^*), 0, 1)$
+  (`ImprovementEpsilon(base_error=…, log_scale=True)`). El error se mueve en órdenes de magnitud: con escala lineal el tramo
+  fácil 50 → 7 títulos ocupa el 88 % de la escala y ε baja demasiado pronto; en log cada división del error por dos suma
+  0,17. Evidencia en D-3.4.
+- **Estado:** CERRADA
+
+### D-3.3 · Traslado a ε: mejor progreso, ε_min y regla de subida
+
+- **Fecha:** 2026-11-12
+- **Decisión:** $\varepsilon = 1 - 0{,}95\,p_{ref}$, con $p_{ref}$ el mejor progreso alcanzado y ε_min = 0,05. Si p cae más de
+  0,1 bajo $p_{ref}$ en 2 evaluaciones seguidas, $p_{ref}$ ← p actual (ε sube hasta lo que corresponde, no a 1)
+  (`exploration.ImprovementEpsilon`; corregido para que la paciencia cuente evaluaciones realmente seguidas).
+- **Justificación:** con el último progreso ε da bandazos (0,52 → 0,89 → 0,18 en la serie inestable). Volver a 1 llenaría el
+  buffer de experiencias aleatorias y haría olvidar. ε nunca a 0 en entrenamiento (T06 ~03:02). Sensibilidad margen ×
+  paciencia: con paciencia 1 se reacciona al bache pasajero del episodio 200; 0,1 × 2 reacciona solo al empeoramiento
+  sostenido.
+- **Estado:** CERRADA
+
+### D-3.4 · Comparación justa con el ε lineal en dos escenarios
+
+- **Fecha:** 2026-11-12
+- **Decisión:** solo cambia el plan de ε; igual configuración, llenado del buffer, secuencia de episodios, ε inicial = 1,
+  ε_min, 300 episodios y evaluación cada 25 (también para el lineal). 3 semillas. Escenario A = config. final del ej. 2;
+  B = config. de partida (`Tracking` c = 5, buffer 50.000), inestable.
+- **Evidencia (E final / área bajo la curva, media de 3 semillas):** A: lineal 0,90 ± 0,00 / 1,62; mejora 0,96 ± 0,09 / 3,44
+  (≤ 2 títulos en el episodio 75 frente al 92). B: lineal 5,65 ± 8,18 / 22,3; mejora 1,07 ± 0,28 / 13,1 (3/3 semillas ≤ 2
+  frente a 2/3). ε por mejora ayuda cuando el aprendizaje es inestable y es algo más lento cuando el agente aprende rápido,
+  por el arranque con ε = 1 que impone E0 (D-3.2).
+- **Variantes de E0 (punto 5, 3 semillas; E final / área / episodio con E ≤ 2):** A: c (E0 fijo, lineal) 0,92 / 2,05 / 83;
+  d (E0 fijo, log) 0,96 / 1,93 / **67**. B: c 1,40 / 19,3 / 275; d **0,96** / 13,9 / 242. d es la única entre las dos
+  mejores en ambos escenarios; en A ninguna variante supera al lineal (1,62 de área). En B la diferencia entre a y d cae
+  dentro del ruido de 3 semillas.
+- **Estado:** CERRADA. Variante recomendada: d.
 
 ---
 
