@@ -49,7 +49,7 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
 ### D-0.5 · Pruebas sobre los datos reales
 
 - **Fecha:** 2026-11-11
-- **Decisión:** `common/test_env.py` (16 pruebas) usa los días de train de REP. Nada de datos sintéticos.
+- **Decisión:** `common/test_env.py` (18 pruebas) usa los días de train de REP. Nada de datos sintéticos.
 - **Justificación:** las invariantes se comprueban sobre los mismos datos que usan los notebooks. Los datos cumplen lo
   supuesto: claves `datetime.date`, una fila cada 5 s de 13:00 a 17:25 (3.177-3.181 filas), sin NaN y `cumvol` nunca
   decreciente; spread mediano 3,3 pb (un tick de 0,005 € sobre ~15 €).

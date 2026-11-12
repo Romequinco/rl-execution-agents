@@ -86,7 +86,18 @@ Empezad por [`notebook_partida.md`](docs/teoria/notebook_partida.md).
 | [`11_glosario.md`](docs/teoria/11_glosario.md) | Términos de RL y de ejecución |
 | [`COBERTURA.md`](docs/teoria/COBERTURA.md) | Dónde quedó cada tramo, página y celda del material |
 
-Los resultados de los ejercicios se añadirán cuando se ejecuten los notebooks con los datos reales.
+## Resultados
+
+Repsol, días de train, evaluación greedy en los 27 episodios de la rejilla (N ∈ {400, 500, 600} × ρ ∈ {0,075; 0,10; 0,125}
+× 3 días). Error de seguimiento en títulos frente al plan TWAP.
+
+| Ejercicio | Resultado |
+|---|---|
+| Referencia | TWAP determinista: error máx. 0,90, error medio 0,44, 27/27 órdenes completas, acaba al 98 % del tiempo |
+| 1 | El circuito completo entrena y ejecuta. Con la recompensa del taller el agente compra todo al principio: acaba al 10 % del tiempo con error máx. 44,7 |
+| 2 | Recompensa de seguimiento con cierre: error máx. 0,90 (igual que el TWAP), error medio 0,27, 27/27 completas, acaba al 99 % del tiempo |
+| 3 | ε por mejora (E0 fijo, escala log) frente al ε lineal, 3 semillas: con la config. final no mejora al lineal (área 1,93 frente a 1,62), aunque baja de 2 títulos antes (episodio 67 frente al 75); con la config. inestable termina en 0,96 frente a 5,65 y reduce el área bajo la curva un 38 % |
+| 4 | Pendiente |
 
 ## Licencia
 
