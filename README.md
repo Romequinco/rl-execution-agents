@@ -38,7 +38,7 @@ libro de 13:00 a 17:25 (Santander y Repsol), y el punto de partida es el noteboo
 |---|---|
 | [`00_datos_y_entorno`](notebooks/00_datos_y_entorno.ipynb) | Datos de Repsol, el entorno con sus 13 funciones, invariantes y referencias (TWAP determinista y aleatorio) |
 | [`ej1_execution_lab`](notebooks/ej1_execution_lab.ipynb) | Ej. 1: Double DQN entrena y ejecuta de principio a fin con la recompensa del taller |
-| [`ej2_twap_recompensas`](notebooks/ej2_twap_recompensas.ipynb) | Ej. 2: recompensa de seguimiento del plan, figuras en la rejilla y barridos de γ, buffer y frecuencia de aprendizaje |
+| [`ej2_twap_recompensas`](notebooks/ej2_twap_recompensas.ipynb) | Ej. 2: recompensa de seguimiento del plan con cierre; replica el TWAP en los 27 episodios de la rejilla (error máx. 0,90 títulos, igual que el determinista) y barridos en dos etapas de γ, recorte, buffer y frecuencia de aprendizaje |
 | [`ej3_exploracion`](notebooks/ej3_exploracion.ipynb) | Ej. 3: ε según la mejora medida frente al ε lineal |
 | [`ej4_extras`](notebooks/ej4_extras.ipynb) | Ej. 4: sin volumen pendiente y ~90 % de la duración (B); parada, checkpoints y recuperación (C) |
 

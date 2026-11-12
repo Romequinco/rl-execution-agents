@@ -11,6 +11,7 @@ El plan TWAP que acaba en h·N pasos marca tras el paso t el objetivo
 """
 import numpy as np
 
+
 class Reward:
     name = "base"
 
@@ -44,11 +45,6 @@ class Default(Reward):
         if vol == 0:
             return 0.0
         return (env.episode_vwap - price) / env.episode_vwap
-
-
-
-        
-
 
 
 class TWAPRule(Reward):
@@ -90,6 +86,40 @@ class Tracking(Reward):
         return -self.pending_penalty * pending / env.vol_care if pending > 0 else 0.0
 
 
+class TrackingCierre(Tracking):
+    """Seguimiento del plan sin atajo por terminar antes (ej. 2).
+
+    Con ``Tracking`` el episodio acaba al completar la orden y, con él, la penalización:
+    comprar todo de golpe cuesta como mucho n pasos de -1 (el error está acotado), y un
+    TWAP perfecto paga ~0,05-0,1 por paso durante N ≈ 10·n pasos. Sin descontar, los dos
+    retornos se parecen (-47,6 frente a -43,0 en la rejilla) y con γ alto el agente
+    aprende a acabar pronto.
+
+    Al terminar antes de N, ``done`` cobra los pasos que faltan como si el agente se
+    quedara quieto con lo ejecutado, descontados con el γ del agente:
+
+        r_cierre = Σ_{k=1}^{N-t} γ^k · r_seguimiento(e, t + k)
+
+    (se suma a la recompensa del último paso, de ahí γ^k). Así el retorno descontado es el mismo que si el episodio durara siempre N pasos, que es
+    como se mide el error de seguimiento (protocol.episode_metrics).
+    """
+    name = "seguimiento_cierre"
+
+    def __init__(self, gamma: float = 0.9, clip: float = 5.0, horizon: float = 1.0, pending_penalty: float = 0.0):
+        super().__init__(clip, horizon, pending_penalty)
+        self.gamma = gamma
+
+    def done(self, env):
+        r = super().done(env)
+        N, n, t = env.episode_bins, env.vol_care, env.state_pos
+        if t >= N:
+            return r
+        k = np.arange(t + 1, N + 1)
+        plan = np.minimum(n, k * n / (self.horizon * N))
+        pen = -np.minimum(np.abs(env.exec_vol - plan), self.clip) / self.clip
+        return r + float((self.gamma ** np.arange(1, len(k) + 1) * pen).sum())
+
+
 class TrackingPrice(Tracking):
     """Idea A del ej. 4: seguimiento del plan más un término local de precio al comprar,
     (mid_t - precio) / mid_t en pb · price_weight. Local y factible: depende del spread
@@ -109,7 +139,7 @@ class TrackingPrice(Tracking):
         return r
 
 
-REWARDS = {cls.name: cls for cls in (Default, TWAPRule, Tracking, TrackingPrice)}
+REWARDS = {cls.name: cls for cls in (Default, TWAPRule, Tracking, TrackingCierre, TrackingPrice)}
 
 
 def make(name: str, **kwargs) -> Reward:

@@ -103,40 +103,63 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
   variables de mercado.
 - **Estado:** CERRADA
 
-### D-2.2 · Recompensa de seguimiento del plan
+### D-2.2 · Recompensa de seguimiento del plan con cierre
 
-- **Fecha:** 2026-11-11
-- **Decisión:** $r_t = -\min(|e_{t+1} - (t+1)\,n/N|,\ 5)/5$ (`rewards.Tracking`). Control: `rewards.TWAPRule` (±1 según
-  coincida con la regla).
-- **Justificación:** local y factible (depende solo del estado y la acción), acotada en [−1, 0] y sin decir qué acción
-  tomar. La recompensa por defecto mide el slippage frente al VWAP de todo el episodio, que el agente no puede anticipar.
-- **Estado:** ABIERTA (confirmar con los datos reales)
+- **Fecha:** 2026-11-12
+- **Decisión:** $r_t = -\min(|e_{t+1} - (t+1)\,n/N|,\ c)/c$ con c = 20, más la penalización de cierre de D-2.6
+  (`rewards.TrackingCierre`). Control: `rewards.TWAPRule` (±1 según coincida con la regla).
+- **Justificación:** local, densa y predecible con [T, V] (la desviación es n·(T − V)), acotada en [−1, 0] y sin decir qué
+  acción tomar. La recompensa por defecto es un slippage de ~1e-4 por compra frente a un VWAP futuro: en la rejilla paga más
+  a «todo al final» (+0,020) que al TWAP (−0,009). **Evidencia (REP train, rejilla de 27, semilla 0):** error máximo 0,90
+  títulos (TWAP determinista 0,90), error medio 0,27 (TWAP 0,44), 27/27 órdenes completas, acaba al 98,9 % del tiempo,
+  intervalo entre compras 1,01 ± 0,07 veces N/n. Control `TWAPRule`: 0,91.
+- **Estado:** CERRADA
 
 ### D-2.3 · γ = 0,9
 
-- **Fecha:** 2026-11-11
-- **Decisión:** γ = 0,9, con barrido {0,9; 0,95; 0,99} × 3 semillas en el notebook.
-- **Justificación:** una compra afecta al error hasta la siguiente, unos N/n ≈ 10 pasos; con γ = 0,9 el horizonte efectivo
-  es de 10 pasos. **Evidencia (REP train, rejilla de 27 órdenes, 300 episodios, semilla 0):** γ = 0,9 replica el TWAP
-  (error máximo medio 0,97 ± 0,11 títulos frente a 0,90 del determinista, termina en el 99 % del tiempo); γ = 0,95 se queda en
-  9,8 y γ = 0,99 en 34,8 y acaba al 30 % del tiempo: con ~500 pasos los Q-valores son grandes y la diferencia entre acciones
-  queda enterrada. Falta repetirlo con 3 semillas en el notebook.
-- **Estado:** ABIERTA (confirmar con el barrido sobre los datos reales)
+- **Fecha:** 2026-11-12
+- **Decisión:** γ = 0,9.
+- **Justificación:** horizonte efectivo de ~10 pasos, la separación entre compras. **Evidencia (barridos con 3 semillas,
+  `results/ej2_sweeps_etapa*.csv`):** con c = 20, γ = 0,9 → 0,91; 0,95 → 1,18; 0,99 → 4,57. Con c = 5 y sin cierre, γ = 0,99
+  acaba la orden al 17 % del tiempo (atajo, ver D-2.6); con cierre usa el 100 % pero se queda en 21 títulos: con Q-valores
+  de ~100 pasos la diferencia entre acciones queda enterrada.
+- **Estado:** CERRADA
 
 ### D-2.4 · Aprender cada 8 pasos y copiar la red objetivo cada 1.000
 
-- **Fecha:** 2026-11-11
+- **Fecha:** 2026-11-12
 - **Decisión:** `learn_after = 8`, `update_target_after = 1000` (el LAB usa 64 y 640).
-- **Justificación:** con 64 hay unas 8 actualizaciones por episodio y en 300 episodios el agente no llega a aprender la
-  frontera: error máximo final 31,2 títulos frente a 0,97 con 8 (REP train, semilla 0). El barrido {8, 64} con 3 semillas
-  queda en el notebook.
-- **Estado:** ABIERTA
+- **Justificación:** con 64 hay ~8 actualizaciones por episodio. **Evidencia:** 64/640 da 15,8 (c = 5) y 6,3 (c = 20) títulos,
+  sin ninguna semilla por debajo de 2 ni órdenes completas; 8/1.000 da 0,91 con c = 20.
+- **Estado:** CERRADA
 
-### D-2.5 · Buffer de 50.000 experiencias
+### D-2.5 · Buffer de 10.000 experiencias
 
-- **Fecha:** 2026-11-11
-- **Decisión:** 50.000 ≈ 100 episodios × ~500 pasos, la regla de clase; barrido {10.000, 50.000}.
-- **Estado:** ABIERTA
+- **Fecha:** 2026-11-12
+- **Decisión:** 10.000 (~20 episodios), en lugar de los 50.000 de partida (regla de ~100 episodios).
+- **Justificación:** **evidencia:** con c = 5, 10.000 → 0,90 en las 3 semillas frente a 3,04 de media; con c = 20, 0,90 en
+  las 3 frente a 0,90-0,94, y baja de 2 títulos antes (episodio 75 frente a 92). Olvida antes el llenado aleatorio; el
+  problema es estacionario (la política óptima no depende del día), así que el riesgo de olvido catastrófico es bajo.
+- **Estado:** CERRADA
+
+### D-2.6 · Penalización de cierre
+
+- **Fecha:** 2026-11-12
+- **Decisión:** si la orden se completa en t_f < N, `done` añade $\sum_{k=1}^{N-t_f} \gamma^k\, r(e_{t_f}, t_f + k)$, los
+  pasos que faltan como si el agente se quedara quieto, descontados con su γ.
+- **Justificación:** al completar la orden el episodio acaba y deja de penalizar: con c = 5 y sin descontar, «todo al
+  principio» cobra −47,6 frente a −43,0 del TWAP pese a un error de 44,7 títulos. Con el cierre, el retorno descontado es el
+  de un episodio de N pasos, como la métrica. Evidencia en D-2.3 (γ = 0,99: 17 % → 100 % del tiempo; γ = 0,95: 12,5 → 4,0).
+- **Estado:** CERRADA
+
+### D-2.7 · Recorte c = 20
+
+- **Fecha:** 2026-11-12
+- **Decisión:** c = 20 títulos (partida: 5).
+- **Justificación:** con c pequeño la recompensa satura lejos del plan y no indica cómo volver. **Evidencia (c = 5 de
+  partida, 3 semillas):** c = 1 → 28,0; c = 5 → 3,04 (0,90 / 1,33 / 6,87, solo el 33 % de órdenes completas); c = 20 → 0,91 en
+  las 3 semillas, por debajo de 2 títulos hacia el episodio 92. La política aprendida coincide con V = T en todo el plano.
+- **Estado:** CERRADA
 
 ---
 
