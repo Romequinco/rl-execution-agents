@@ -43,13 +43,13 @@ libro de 13:00 a 17:25 (Santander y Repsol), y el punto de partida es el noteboo
 | [`ej4_extras`](notebooks/ej4_extras.ipynb) | Ej. 4: sin volumen pendiente y ~90 % de la duración (B); parada, checkpoints y recuperación (C) |
 
 El código está en [`notebooks/common/`](notebooks/common): `env.py` (entorno), `rewards.py`, `agents.py` (DDQN en PyTorch y
-TWAP), `exploration.py`, `protocol.py` (rejilla, métricas, bucle), `plots.py`, `data.py`, `ej3.py` (figuras y ejecuciones del ej. 3) y `test_env.py`. Las decisiones,
+TWAP), `exploration.py`, `protocol.py` (rejilla, métricas, bucle), `plots.py`, `data.py`, `ej3.py` (figuras y ejecuciones del ej. 3), `ej4.py` (ideas B y C del ej. 4: recompensa con plan a 0,9·N, `Trainer` con checkpoints y reanudación), `test_env.py` y `test_ej4.py`. Las decisiones,
 con su justificación, están en [`docs/DECISIONES.md`](docs/DECISIONES.md).
 
 ```bash
 pip install -r requirements.txt
 cd notebooks
-python -m unittest common.test_env -v
+python -m unittest common.test_env common.test_ej4 -v
 jupyter lab
 ```
 
@@ -97,7 +97,7 @@ Repsol, días de train, evaluación greedy en los 27 episodios de la rejilla (N 
 | 1 | Circuito completo con el reward original del LAB, sin penalización terminal. La configuración final (semilla 0) completa 27/27 órdenes en la rejilla de train y 27/27 en la de test; acaba al 10,8 % del tiempo. Error máx. medio en train: 44,37 títulos |
 | 2 | Recompensa de seguimiento con cierre: error máx. 0,90 (igual que el TWAP), error medio 0,27, 27/27 completas, acaba al 99 % del tiempo |
 | 3 | ε por mejora (E0 fijo, escala log) frente al ε lineal, 3 semillas: con la config. final no mejora al lineal (área 1,93 frente a 1,62), aunque baja de 2 títulos antes (episodio 67 frente al 75); con la config. inestable termina en 0,96 frente a 5,65 y reduce el área bajo la curva un 38 % |
-| 4 | Pendiente |
+| 4 | B: plan de seguimiento a 0,9·N con cierre y k = 1: 100 % completas y acaba al 88,7 % del tiempo (100 % en la banda 80-95 %, también en test); k no cambia nada y γ = 0,995 lo desestabiliza. C: parada por objetivo en 125-150 episodios en vez de 300 con el mismo error (0,89-0,92), checkpoint completo con reanudación exacta. A: planteada, sin implementar |
 
 ## Licencia
 
