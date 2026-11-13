@@ -1,7 +1,7 @@
 """Idea C del ej. 4: parada por aprendizaje, checkpoints y reanudación (D-4.2).
 
 Sobre la configuración elegida en la idea B y con el ε por mejora del ej. 3 (variante d):
-1. Tres semillas con parada: objetivo (error ≤ TARGET en 2 evaluaciones seguidas), estancamiento
+1. Cinco semillas con parada: objetivo (error ≤ TARGET en 2 evaluaciones seguidas), estancamiento
    (PATIENCE evaluaciones sin mejorar 0,05) o tope de MAX_EP episodios. Se guardan *_best.pt y *_last.pt.
 2. Mejor frente a último: evaluación completa de los dos checkpoints de cada semilla.
 3. Demostración de recuperación: la semilla 0 se interrumpe en el episodio CUT (a mitad, antes de
@@ -27,7 +27,7 @@ import torch  # noqa: E402
 from common import ej4, protocol as pr  # noqa: E402
 
 TARGET, HITS, PATIENCE, MAX_EP, CUT, FIXED = 1.5, 2, 6, 600, 60, 300
-SEEDS = (0, 1, 2)
+SEEDS = (0, 1, 2, 3, 4)
 CK = pr.MODELS / "ej4_ideaC"
 
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     ap.add_argument("--k", type=float, default=0.0)
     ap.add_argument("--gamma", type=float, default=0.9)
     a = ap.parse_args()
-    with ProcessPoolExecutor(len(SEEDS)) as pool:
+    with ProcessPoolExecutor(4) as pool:
         outs = list(pool.map(one, [(a.horizon, a.k, a.gamma, s) for s in SEEDS]))
     pr.save_df(pd.concat([o["ep"] for o in outs]), "ej4_ideaC_train")
     pr.save_df(pd.concat([o["ev"] for o in outs]), "ej4_ideaC_evals")

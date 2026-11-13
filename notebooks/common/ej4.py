@@ -356,3 +356,268 @@ def load_train_b(configs, seeds=(0, 1, 2)):
             tr = pd.read_csv(pr.RESULTS / RUNS_B / f"{run_name(h, k, g, s)}_train.csv")
             rows.append(tr.assign(horizon=h, k=k, gamma=g, seed=s))
     return pd.concat(rows, ignore_index=True)
+
+
+# ====================================================================== ampliaciones
+# ---------------------------------------------------------------------- evaluación general
+def run_policy(env, agent, cfg, delay=0.0):
+    """Un episodio greedy; durante la fracción ``delay`` inicial no se compra (empieza con retraso)."""
+    s = env.reset(**{k: cfg[k] for k in ("day", "start_pos", "n_bins", "vol_care")})
+    wait = int(delay * env.episode_bins)
+    ret = 0.0
+    while True:
+        a = 0 if env.state_pos < wait else agent.act(s)
+        s, r, done, _ = env.step(a)
+        ret += r
+        if done:
+            return ret
+
+
+def evaluate_general(agent, data, grid, reward, horizon=0.9, env_cls=BestExecutionEnv, env_kw=None,
+                     delay=0.0, ref=None):
+    """Evaluación greedy con entorno configurable (rangos de N y ρ, entorno de mercado, retraso).
+    ``ref``: política de referencia para el slippage (por defecto el TWAP que acaba en horizon·N);
+    slip_vs_ref_bps > 0 significa que el agente compra más barato que la referencia en el mismo episodio."""
+    env_kw = dict(env_kw or {})
+    env = env_cls(data, reward=reward, seed=0, **env_kw)
+    renv = env_cls(data, reward=reward, seed=0, **env_kw)
+    ref = ref or TWAPh(horizon)
+    old_env, old_train = getattr(agent, "env", None), getattr(agent, "_trainable", False)
+    agent.env, ref.env = env, renv
+    agent.set_trainable(False)
+    rows = []
+    try:
+        for i, cfg in enumerate(grid):
+            ret = run_policy(env, agent, cfg, delay)
+            m = {"ep": i, "day": str(cfg["day"]), "rho": cfg["rho"], **pr.episode_metrics(env, ret),
+                 **metrics_h(env, horizon)}
+            run_policy(renv, ref, cfg, delay)
+            r_algo = renv._compute_algo_vwap()
+            m["slip_vs_ref_bps"] = (r_algo - m["algo_vwap"]) / r_algo * 1e4 if np.isfinite(m["algo_vwap"]) else np.nan
+            rows.append(m)
+    finally:
+        agent.env = old_env
+        agent.set_trainable(old_train)
+    return pd.DataFrame(rows)
+
+
+def make_grid_custom(data, Ns, rhos, n_days, seed=0, look_back=60):
+    """Como protocol.make_grid pero con N y ρ libres (fuera del rango de entrenamiento)."""
+    rng = np.random.default_rng(seed)
+    days = list(data.keys())
+    chosen = [days[i] for i in rng.choice(len(days), size=min(n_days, len(days)), replace=False)]
+    grid = []
+    for day in chosen:
+        for N in Ns:
+            start = int(rng.integers(look_back, len(data[day]) - N + 1))
+            for rho in rhos:
+                grid.append({"day": day, "start_pos": start, "n_bins": N, "vol_care": int(rho * N), "rho": rho})
+    return grid
+
+
+WIDE = dict(bins_range=(200, 900), pct_range=(0.03, 0.25))   # entorno que admite órdenes fuera del rango
+
+
+def load_agent_b(seed, data, horizon=0.9, k=1.0, gamma=0.9, env_kw=None):
+    a = DDQNAgent(BestExecutionEnv(data, reward=make_reward(horizon, k, gamma), seed=seed, **(env_kw or {})),
+                  seed=seed, gamma=gamma, hidden_neurons=BASE["hidden_neurons"])
+    a.load(pr.RESULTS / RUNS_B / f"{run_name(horizon, k, gamma, seed)}.pt")
+    return a
+
+
+# ---------------------------------------------------------------------- banda de finalización (B-2)
+class BandTracking(rw.TrackingCierre):
+    """Variante B-2: en vez de un plan fijo, un pasillo entre el TWAP que acaba en lo·N y el que acaba
+    en hi·N. Dentro del pasillo la recompensa es 0; fuera, -min(distancia al pasillo, c)/c. El agente
+    elige cuándo terminar dentro de la banda. Mantiene el cierre y -k·pendiente/n."""
+    name = "banda"
+
+    def __init__(self, gamma=0.9, clip=20.0, lo=0.80, hi=0.95, pending_penalty=1.0):
+        super().__init__(gamma=gamma, clip=clip, horizon=hi, pending_penalty=pending_penalty)
+        self.lo, self.hi = lo, hi
+
+    def _pen(self, e, t, n, N):
+        fast = np.minimum(n, t * n / (self.lo * N))     # borde rápido (acabar en lo·N)
+        slow = np.minimum(n, t * n / (self.hi * N))     # borde lento (acabar en hi·N)
+        d = np.maximum(slow - e, 0) + np.maximum(e - fast, 0)
+        return -np.minimum(d, self.clip) / self.clip
+
+    def step(self, env, price, vol):
+        return float(self._pen(env.exec_vol, env.state_pos + 1, env.vol_care, env.episode_bins))
+
+    def done(self, env):
+        pending = env.vol_care - env.exec_vol
+        r = -self.pending_penalty * pending / env.vol_care if pending > 0 else 0.0
+        N, n, t = env.episode_bins, env.vol_care, env.state_pos
+        if t >= N:
+            return r
+        k = np.arange(t + 1, N + 1)
+        return r + float((self.gamma ** np.arange(1, len(k) + 1) * self._pen(env.exec_vol, k, n, N)).sum())
+
+
+RUNS_BAND = "ej4_banda_runs"
+
+
+def run_band(seed, nepisodes=300, asset="REP"):
+    """Mismo entrenamiento que la idea B elegida, cambiando solo la recompensa por BandTracking."""
+    import torch
+    out = pr.RESULTS / RUNS_BAND
+    f_ev = out / f"s{seed}_eval.csv"
+    if f_ev.exists():
+        return f_ev.name
+    torch.set_num_threads(1)
+    out.mkdir(parents=True, exist_ok=True)
+    train = dt.load(asset)["train"]
+    grid = pr.make_grid(train, n_days=3, seed=0)
+    reward = BandTracking()
+    pr.set_seeds(seed)
+    env = BestExecutionEnv(train, reward=reward, seed=seed)
+    agent = DDQNAgent(env, seed=seed, epsilon=1.0, gamma=BASE["gamma"], alpha=BASE["alpha"], buffer_size=BASE["buffer_size"],
+                      batch_size=BASE["batch_size"], hidden_neurons=BASE["hidden_neurons"])
+    pr.fill_buffer(agent, env, 25)
+    ep, _ = pr.train(agent, env, nepisodes, ex.LinearDecay(1.0, 0.05, nepisodes=nepisodes),
+                     BASE["learn_after"], BASE["update_target_after"], verbose=False)
+    res = evaluate_general(agent, train, grid, reward, 0.9)
+    ep.to_csv(out / f"s{seed}_train.csv", index=False)
+    agent.save(out / f"s{seed}.pt", seed=seed)
+    res.to_csv(f_ev, index=False)
+    return f_ev.name
+
+
+# ---------------------------------------------------------------------- idea A: mercado en el estado
+FEATS = ("spread", "desbalanceo", "rend_1min", "actividad_1min")
+
+
+def _raw_features(df):
+    """Variables de mercado causales por bin (solo usan el bin actual y los anteriores)."""
+    ask, bid = df["ask1"].values.astype(float), df["bid1"].values.astype(float)
+    mid = (ask + bid) / 2
+    spread = (ask - bid) / mid * 1e4                                       # pb
+    va, vb = df["vask1"].values.astype(float), df["vbid1"].values.astype(float)
+    imb = np.where(va + vb > 0, vb / np.maximum(va + vb, 1e-12) - 0.5, 0.0)  # > 0: más demanda que oferta
+    lm = np.log(mid)
+    ret = np.zeros_like(lm)
+    ret[12:] = (lm[12:] - lm[:-12]) * 1e4                                   # pb en el último minuto
+    v = np.diff(df["cumvol"].values.astype(float), prepend=df["cumvol"].values[0])
+    act = np.log1p(np.convolve(np.maximum(v, 0), np.ones(12))[:len(v)])     # volumen del último minuto (log)
+    return np.column_stack([spread, imb, ret, act])
+
+
+def market_norm(train):
+    X = np.vstack([_raw_features(df) for df in train.values()])
+    return X.mean(axis=0), X.std(axis=0) + 1e-9
+
+
+class MarketEnv(BestExecutionEnv):
+    """Estado [T, V, spread, desbalanceo, rendimiento 1 min, actividad 1 min], normalizado con medias de
+    train. placebo=True baraja las variables de mercado dentro del episodio: mismas distribuciones,
+    sin relación con el momento (control de que una mejora venga de la información)."""
+
+    def __init__(self, data, norm=None, placebo=False, **kw):
+        self.norm, self.placebo = norm, placebo
+        super().__init__(data, **kw)
+
+    def _compute_episode_market_feat(self):
+        out = super()._compute_episode_market_feat()
+        X = _raw_features(self.episode_full)[self.look_back:]
+        self._spread_raw = (self.episode["ask1"].values - self.episode["bid1"].values).astype(float)
+        if self.norm is not None:
+            X = np.clip((X - self.norm[0]) / self.norm[1], -5, 5)
+        if self.placebo:
+            X = X[np.random.default_rng(self.hour_pos).permutation(len(X))]
+        self._feat = X
+        return out
+
+    def observation_builder(self):
+        i = min(self.state_pos, len(self._feat) - 1)
+        return np.concatenate([[self.time_left(), self.vol_left()], self._feat[i]])
+
+
+class TrackingPriceCierre(rw.TrackingCierre):
+    """Recompensa de la idea B + término local de precio al comprar: w · (mid − precio)/mid en pb.
+    Comprar al ask cuesta medio spread, así que premia comprar cuando el spread es estrecho.
+    Es local y factible: no usa el VWAP final del episodio."""
+    name = "seguimiento_precio_cierre"
+
+    def __init__(self, gamma=0.9, clip=20.0, horizon=0.9, pending_penalty=1.0, price_weight=0.01):
+        super().__init__(gamma=gamma, clip=clip, horizon=horizon, pending_penalty=pending_penalty)
+        self.price_weight = price_weight
+
+    def step(self, env, price, vol):
+        r = super().step(env, price, vol)
+        if vol > 0:
+            mid = env._mid[env.state_pos]
+            r += self.price_weight * (mid - price) / mid * 1e4
+        return r
+
+
+class SpreadRule(TWAPh):
+    """Regla de bróker de referencia: sigue el TWAP a 0,9·N y además adelanta compras (hasta ``ahead``
+    títulos por delante del plan) cuando el spread está en el mínimo de 1 tick."""
+
+    def __init__(self, horizon=0.9, ahead=2, tick=0.005, env=None):
+        super().__init__(horizon, env)
+        self.ahead, self.tick = ahead, tick
+
+    def act(self, s):
+        if super().act(s):
+            return 1
+        e = self.env
+        plan = min(e.vol_care, (e.state_pos + 1) * e.vol_care / (self.horizon * e.episode_bins))
+        return int(e._spread_raw[e.state_pos] <= self.tick + 1e-9 and e.exec_vol < plan + self.ahead)
+
+
+RUNS_A = "ej4_ideaA_runs"
+
+
+def name_a(w, placebo, seed):
+    return f"w{w:g}__{'placebo' if placebo else 'real'}__s{seed}"
+
+
+def run_a(w, placebo, seed, nepisodes=300, asset="REP"):
+    """Entrena con estado de mercado y TrackingPriceCierre(w); evalúa en validación (todos los días)."""
+    import torch
+    out = pr.RESULTS / RUNS_A
+    name = name_a(w, placebo, seed)
+    f_ev = out / f"{name}_eval.csv"
+    if f_ev.exists():
+        return name
+    torch.set_num_threads(1)
+    out.mkdir(parents=True, exist_ok=True)
+    D = dt.load(asset)
+    norm = market_norm(D["train"])
+    reward = TrackingPriceCierre(price_weight=w)
+    pr.set_seeds(seed)
+    env = MarketEnv(D["train"], norm=norm, placebo=placebo, reward=reward, seed=seed)
+    agent = DDQNAgent(env, seed=seed, epsilon=1.0, gamma=BASE["gamma"], alpha=BASE["alpha"],
+                      buffer_size=BASE["buffer_size"], batch_size=BASE["batch_size"],
+                      hidden_neurons=BASE["hidden_neurons"])
+    pr.fill_buffer(agent, env, 25)
+    ep, _ = pr.train(agent, env, nepisodes, ex.LinearDecay(1.0, 0.05, nepisodes=nepisodes),
+                     BASE["learn_after"], BASE["update_target_after"], verbose=False)
+    grid = pr.make_grid(D["val"], n_days=len(D["val"]), seed=0)
+    res = evaluate_general(agent, D["val"], grid, reward, 0.9, env_cls=MarketEnv,
+                           env_kw=dict(norm=norm, placebo=placebo))
+    ep.to_csv(out / f"{name}_train.csv", index=False)
+    agent.save(out / f"{name}.pt", w=w, placebo=placebo, seed=seed)
+    res.to_csv(f_ev, index=False)
+    return name
+
+
+def load_agent_a(w, placebo, seed, data, norm):
+    env = MarketEnv(data, norm=norm, placebo=placebo, reward=TrackingPriceCierre(price_weight=w), seed=seed)
+    a = DDQNAgent(env, seed=seed, gamma=BASE["gamma"], hidden_neurons=BASE["hidden_neurons"])
+    a.load(pr.RESULTS / RUNS_A / f"{name_a(w, placebo, seed)}.pt")
+    return a
+
+
+def _run_job(job):
+    kind, args = job
+    return {"A": run_a, "B": run_b, "banda": run_band}[kind](*args)
+
+
+def run_jobs(jobs, workers=4):
+    """Ejecuta en paralelo una lista de (tipo, argumentos); cada función se salta lo que ya existe."""
+    from concurrent.futures import ProcessPoolExecutor
+    with ProcessPoolExecutor(min(workers, len(jobs))) as pool:
+        return list(pool.map(_run_job, jobs))
