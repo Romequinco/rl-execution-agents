@@ -20,7 +20,10 @@ def main():
     decision = json.loads((OUT / "decision.json").read_text(encoding="utf-8"))
     assert hashlib.sha256(protocol_text.encode()).hexdigest() == decision["protocol_sha256"]
     for name, digest in protocol["sha256"].items():
-        assert hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest, name
+        # Los .py también se comparan con LF: con autocrlf=true Windows los deja en CRLF.
+        raw = (ROOT / name).read_bytes()
+        assert digest in {hashlib.sha256(raw).hexdigest(),
+                          hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()}, name
     manifests = list(OUT.glob("*/*/manifest.json"))
     assert len(manifests) == 28
     for path in manifests:
@@ -46,7 +49,7 @@ def main():
     notebook = nbformat.read(notebook_path, as_version=4)
     nbformat.validate(notebook)
     code = [c for c in notebook.cells if c.cell_type == "code"]
-    assert [c.execution_count for c in code] == list(range(1, 9))
+    assert [c.execution_count for c in code] == list(range(1, len(code) + 1))
     assert not any(o.output_type == "error" for c in code for o in c.outputs)
     prior = json.loads((ROOT / "results/ej1_final_checks/decision.json").read_text(encoding="utf-8"))
     assert hashlib.sha256(notebook_path.read_bytes()).hexdigest() == prior["notebook_sha256"]
