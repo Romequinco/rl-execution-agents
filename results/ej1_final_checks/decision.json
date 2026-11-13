@@ -1,0 +1,85 @@
+{
+  "selected_case": "base",
+  "selected_seed": 0,
+  "selection_split": "train",
+  "reason": "Conservar la configuración del ejercicio 1: completa 81/81 órdenes en las tres semillas; bajar alpha reduce la consistencia y subir gamma no mejora el slippage de forma consistente.",
+  "scope": "Comprobación acotada del circuito. No demuestra optimalidad ni garantiza completitud fuera de los episodios evaluados. No se utiliza el error TWAP como objetivo de selección del ejercicio 1.",
+  "frozen_config": {
+    "asset": "REP",
+    "reward": "default",
+    "terminal_reward": 0.0,
+    "obs_mode": "TV",
+    "look_back": 60,
+    "bins_range": [
+      400,
+      600
+    ],
+    "pct_range": [
+      0.075,
+      0.125
+    ],
+    "gamma": 0.99,
+    "alpha": 0.001,
+    "epsilon": 1.0,
+    "min_epsilon": 0.02,
+    "epsilon_decay": 0.00049,
+    "buffer_size": 50000,
+    "batch_size": 64,
+    "hidden_neurons": 64,
+    "nepisodes": 4000,
+    "learn_after": 64,
+    "update_target_after": 640,
+    "fill_episodes": 25,
+    "force_first_buy": true,
+    "seed": 0,
+    "grid_seed": 0,
+    "grid_days": 3,
+    "torch_threads": 1,
+    "source_sha256": {
+      "env": "054780757624ec4691c5e93990fe8e372a996ce122fcf84a8a5039d34f8149ad",
+      "rewards": "2f23d5b22ef6561a8e4cd98456cfcec3e198387ff27158b3545f88f5537486f7",
+      "agents": "b10900ef4b5616e88038c82ae248f8f212ca7104c1ed486e2296cc0434e9d970",
+      "protocol": "6bdabbe46e94a9c75b057b18c6026e1b9edccb52ddee66412c83e3a428a37492",
+      "exploration": "52146398142b9149b456429fc037e8284c8efa53219bedab2323165762e45caa",
+      "data": "2a5028419fd9bc73712e742ecba681782af70bdbd71ff6d67f8c225426b95078"
+    }
+  },
+  "comparison": [
+    {
+      "case": "base",
+      "runs": 3,
+      "episodes_evaluated": 81,
+      "completed": 81,
+      "pending_mean": 0.0,
+      "t_fin_mean": 0.10246913580246915,
+      "slippage_bps_mean": -2.8271452504163483
+    },
+    {
+      "case": "alpha_1e-4",
+      "runs": 3,
+      "episodes_evaluated": 81,
+      "completed": 54,
+      "pending_mean": 4.444444444444445,
+      "t_fin_mean": 0.4005185185185185,
+      "slippage_bps_mean": -2.1223465806557917
+    },
+    {
+      "case": "gamma_0.999",
+      "runs": 3,
+      "episodes_evaluated": 81,
+      "completed": 81,
+      "pending_mean": 0.0,
+      "t_fin_mean": 0.10738888888888888,
+      "slippage_bps_mean": -3.0694098734923574
+    }
+  ],
+  "verification": {
+    "existing_tests_passed": 18,
+    "notebook_code_cells_executed": 8,
+    "notebook_matches_base_seed0": true,
+    "checkpoint_reload_matches_evaluation": true,
+    "train_grid_completed": 27,
+    "test_grid_completed": 27
+  },
+  "notebook_sha256": "0155671bd0a1f68acd70a8581ab7698f41ea57eb7572ed9126ac38eec64f10a4"
+}

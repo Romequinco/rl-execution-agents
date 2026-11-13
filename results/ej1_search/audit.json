@@ -1,0 +1,17 @@
+{
+  "training_runs": 28,
+  "training_episodes": 74000,
+  "screen_configurations": 19,
+  "confirmation_configurations": 3,
+  "confirmation_seeds": [
+    0,
+    1,
+    2
+  ],
+  "evaluations_per_confirmation": 108,
+  "reward_identity_checked_all_runs": true,
+  "source_hashes_verified": true,
+  "selected_checkpoint_matches_current": true,
+  "notebook_unchanged_and_executed": true,
+  "previous_six_runs_reproduced": true
+}

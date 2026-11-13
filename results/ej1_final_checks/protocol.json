@@ -1,0 +1,239 @@
+{
+  "base": {
+    "gamma": 0.99,
+    "alpha": 0.001,
+    "epsilon": 1.0,
+    "batch_size": 64,
+    "buffer_size": 50000,
+    "hidden_neurons": 64,
+    "force_first_buy": true
+  },
+  "cases": {
+    "base": {},
+    "alpha_1e-4": {
+      "alpha": 0.0001
+    },
+    "gamma_0.999": {
+      "gamma": 0.999
+    }
+  },
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "nepisodes": 4000,
+  "min_epsilon": 0.02,
+  "epsilon_decay": 0.00049,
+  "fill_episodes": 25,
+  "learn_after": 64,
+  "update_target_after": 640,
+  "obs_mode": "TV",
+  "reward": "Default: (episode_vwap-price)/episode_vwap if buy; else 0; done=0",
+  "grid": [
+    {
+      "day": "2018-02-22",
+      "start_pos": 171,
+      "n_bins": 400,
+      "vol_care": 30,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-02-22",
+      "start_pos": 171,
+      "n_bins": 400,
+      "vol_care": 40,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-02-22",
+      "start_pos": 171,
+      "n_bins": 400,
+      "vol_care": 50,
+      "rho": 0.125
+    },
+    {
+      "day": "2018-02-22",
+      "start_pos": 257,
+      "n_bins": 500,
+      "vol_care": 37,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-02-22",
+      "start_pos": 257,
+      "n_bins": 500,
+      "vol_care": 50,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-02-22",
+      "start_pos": 257,
+      "n_bins": 500,
+      "vol_care": 62,
+      "rho": 0.125
+    },
+    {
+      "day": "2018-02-22",
+      "start_pos": 101,
+      "n_bins": 600,
+      "vol_care": 45,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-02-22",
+      "start_pos": 101,
+      "n_bins": 600,
+      "vol_care": 60,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-02-22",
+      "start_pos": 101,
+      "n_bins": 600,
+      "vol_care": 75,
+      "rho": 0.125
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 537,
+      "n_bins": 400,
+      "vol_care": 30,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 537,
+      "n_bins": 400,
+      "vol_care": 40,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 537,
+      "n_bins": 400,
+      "vol_care": 50,
+      "rho": 0.125
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 2192,
+      "n_bins": 500,
+      "vol_care": 37,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 2192,
+      "n_bins": 500,
+      "vol_care": 50,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 2192,
+      "n_bins": 500,
+      "vol_care": 62,
+      "rho": 0.125
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 1697,
+      "n_bins": 600,
+      "vol_care": 45,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 1697,
+      "n_bins": 600,
+      "vol_care": 60,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-02-13",
+      "start_pos": 1697,
+      "n_bins": 600,
+      "vol_care": 75,
+      "rho": 0.125
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 2543,
+      "n_bins": 400,
+      "vol_care": 30,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 2543,
+      "n_bins": 400,
+      "vol_care": 40,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 2543,
+      "n_bins": 400,
+      "vol_care": 50,
+      "rho": 0.125
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 1380,
+      "n_bins": 500,
+      "vol_care": 37,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 1380,
+      "n_bins": 500,
+      "vol_care": 50,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 1380,
+      "n_bins": 500,
+      "vol_care": 62,
+      "rho": 0.125
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 1589,
+      "n_bins": 600,
+      "vol_care": 45,
+      "rho": 0.075
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 1589,
+      "n_bins": 600,
+      "vol_care": 60,
+      "rho": 0.1
+    },
+    {
+      "day": "2018-03-12",
+      "start_pos": 1589,
+      "n_bins": 600,
+      "vol_care": 75,
+      "rho": 0.125
+    }
+  ],
+  "torch_threads": 1,
+  "python": "3.13.7",
+  "numpy": "2.5.4",
+  "pandas": "3.1.1",
+  "torch": "2.15.0+cpu",
+  "sha256": {
+    "notebooks\\common\\env.py": "054780757624ec4691c5e93990fe8e372a996ce122fcf84a8a5039d34f8149ad",
+    "notebooks\\common\\rewards.py": "2f23d5b22ef6561a8e4cd98456cfcec3e198387ff27158b3545f88f5537486f7",
+    "notebooks\\common\\agents.py": "b10900ef4b5616e88038c82ae248f8f212ca7104c1ed486e2296cc0434e9d970",
+    "notebooks\\common\\protocol.py": "6bdabbe46e94a9c75b057b18c6026e1b9edccb52ddee66412c83e3a428a37492",
+    "notebooks\\common\\exploration.py": "52146398142b9149b456429fc037e8284c8efa53219bedab2323165762e45caa",
+    "notebooks\\common\\data.py": "2a5028419fd9bc73712e742ecba681782af70bdbd71ff6d67f8c225426b95078",
+    "docs\\raw\\MIAX14\\best-execution\\data\\new_version\\rep_data.pkl": "282652874139a7bccfc0ac630a84aa365555b99da2ab74024175d4810a24b08d",
+    "scripts\\ej1_final_checks.py": "2cef7d5c35dd6a36b62dfd595b2bf21975979d411c8d62907f9d54d31cb35843"
+  }
+}

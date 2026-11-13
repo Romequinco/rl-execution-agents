@@ -1,0 +1,45 @@
+{
+  "signature": {
+    "stage": "screen",
+    "case": "gamma_0.995",
+    "seed": 0,
+    "episodes": 2000,
+    "config": {
+      "gamma": 0.995,
+      "alpha": 0.001,
+      "epsilon": 1.0,
+      "batch_size": 64,
+      "buffer_size": 50000,
+      "hidden_neurons": 64,
+      "force_first_buy": true,
+      "learn_after": 64,
+      "update_target_after": 640
+    },
+    "fingerprint": "86905873ba65b46d9aead04e159ede77b4d175178014d705ce7c415986d32e23"
+  },
+  "summary": {
+    "stage": "screen",
+    "case": "gamma_0.995",
+    "seed": 0,
+    "episodes": 2000,
+    "gamma": 0.995,
+    "alpha": 0.001,
+    "epsilon": 1.0,
+    "batch_size": 64,
+    "buffer_size": 50000,
+    "hidden_neurons": 64,
+    "force_first_buy": true,
+    "learn_after": 64,
+    "update_target_after": 640,
+    "fill_steps": 12202,
+    "seconds": 21.22178669999994,
+    "n_eval": 27,
+    "completed": 27,
+    "completion_rate": 1.0,
+    "pending_fraction": 0.0,
+    "pending_mean": 0.0,
+    "slippage_bps": -2.826399071612099,
+    "t_fin": 0.0997777777777778,
+    "max_err": 44.702666666666666
+  }
+}

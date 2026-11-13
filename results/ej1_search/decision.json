@@ -1,0 +1,61 @@
+{
+  "selected_case": "base",
+  "selected_seed": 0,
+  "parameters": {
+    "gamma": 0.99,
+    "alpha": 0.001,
+    "epsilon": 1.0,
+    "batch_size": 64,
+    "buffer_size": 50000,
+    "hidden_neurons": 64,
+    "force_first_buy": true,
+    "learn_after": 64,
+    "update_target_after": 640
+  },
+  "episodes": 4000,
+  "comparison": [
+    {
+      "case": "base",
+      "completed": 324,
+      "n_eval": 324,
+      "min_seed_completion": 1.0,
+      "pending_fraction": 0.0,
+      "slippage_bps": 1.110110210853317,
+      "slippage_seed_std": 0.007162310266921751,
+      "gain_over_base_bps": 0.0,
+      "improved_seeds": 0,
+      "t_fin": 0.10246913580246914,
+      "eligible": false
+    },
+    {
+      "case": "alpha_1e-4",
+      "completed": 216,
+      "n_eval": 324,
+      "min_seed_completion": 0.0,
+      "pending_fraction": 0.08911594390089012,
+      "slippage_bps": 1.10499323469049,
+      "slippage_seed_std": 0.013084498932294662,
+      "gain_over_base_bps": -0.009252137923453696,
+      "improved_seeds": 0,
+      "t_fin": 0.4005185185185185,
+      "eligible": false
+    },
+    {
+      "case": "target_1280",
+      "completed": 324,
+      "n_eval": 324,
+      "min_seed_completion": 1.0,
+      "pending_fraction": 0.0,
+      "slippage_bps": 1.1142453726139439,
+      "slippage_seed_std": 0.0,
+      "gain_over_base_bps": 0.004135161760626893,
+      "improved_seeds": 1,
+      "t_fin": 0.09977777777777778,
+      "eligible": false
+    }
+  ],
+  "protocol_sha256": "86905873ba65b46d9aead04e159ede77b4d175178014d705ce7c415986d32e23",
+  "selection_split": "train only",
+  "test_used_for_selection": false,
+  "limitations": "One-factor search, single-seed screening and three-seed confirmation; not a global optimum or statistical significance test."
+}

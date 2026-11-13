@@ -94,7 +94,7 @@ Repsol, días de train, evaluación greedy en los 27 episodios de la rejilla (N 
 | Ejercicio | Resultado |
 |---|---|
 | Referencia | TWAP determinista: error máx. 0,90, error medio 0,44, 27/27 órdenes completas, acaba al 98 % del tiempo |
-| 1 | El circuito completo entrena y ejecuta. Con la recompensa del taller el agente compra todo al principio: acaba al 10 % del tiempo con error máx. 44,7 |
+| 1 | Circuito completo con el reward original del LAB, sin penalización terminal. La configuración final (semilla 0) completa 27/27 órdenes en la rejilla de train y 27/27 en la de test; acaba al 10,8 % del tiempo. Error máx. medio en train: 44,37 títulos |
 | 2 | Recompensa de seguimiento con cierre: error máx. 0,90 (igual que el TWAP), error medio 0,27, 27/27 completas, acaba al 99 % del tiempo |
 | 3 | ε por mejora (E0 fijo, escala log) frente al ε lineal, 3 semillas: con la config. final no mejora al lineal (área 1,93 frente a 1,62), aunque baja de 2 títulos antes (episodio 67 frente al 75); con la config. inestable termina en 0,96 frente a 5,65 y reduce el área bajo la curva un 38 % |
 | 4 | Pendiente |
