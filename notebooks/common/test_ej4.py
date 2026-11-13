@@ -34,6 +34,38 @@ class TestIdeaB(unittest.TestCase):
             self.assertAlmostEqual(row["terminal_k10"], -10 * row["pendiente_frac"])
 
 
+class TestAmpliaciones(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.data = load("REP")
+        cls.norm = ej4.market_norm(cls.data["train"])
+
+    def test_variables_de_mercado_causales(self):
+        # Cambiar el futuro de un día no cambia las variables del pasado
+        df = next(iter(self.data["train"].values())).copy()
+        x1 = ej4._raw_features(df)
+        df.iloc[500:, :4] = df.iloc[500:, :4] * 1.1
+        x2 = ej4._raw_features(df)
+        np.testing.assert_array_equal(x1[:500], x2[:500])
+
+    def test_placebo_mismas_variables_otro_orden(self):
+        kw = dict(norm=self.norm, reward=ej4.TrackingPriceCierre(), seed=0)
+        cfg = pr.make_grid(self.data["train"], n_days=1, seed=0)[0]
+        args = {k: cfg[k] for k in ("day", "start_pos", "n_bins", "vol_care")}
+        real, plac = ej4.MarketEnv(self.data["train"], **kw), ej4.MarketEnv(self.data["train"], placebo=True, **kw)
+        real.reset(**args), plac.reset(**args)
+        self.assertFalse(np.array_equal(real._feat, plac._feat))
+        np.testing.assert_allclose(np.sort(real._feat, axis=0), np.sort(plac._feat, axis=0))
+
+    def test_pasillo_sin_castigo_dentro(self):
+        b = ej4.BandTracking()
+        n, N = 50, 500
+        for t in (100, 250, 400):
+            dentro = (t * n / (0.95 * N) + min(n, t * n / (0.80 * N))) / 2
+            self.assertEqual(float(b._pen(dentro, t, n, N)), 0.0)
+            self.assertLess(float(b._pen(0, t, n, N)), 0.0)
+
+
 class TestIdeaC(unittest.TestCase):
     def test_reanudacion_exacta(self):
         with tempfile.TemporaryDirectory() as d:
