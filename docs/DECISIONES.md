@@ -226,40 +226,50 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
 
 ## Bloque 4 · Ej. 4
 
-### D-4.1 · Idea B: plan al 90 % y penalización del volumen pendiente
+### D-4.1 · Idea B: plan que termina al 90 %
 
-- **Fecha:** 2026-11-11 (cerrada 2026-11-13)
-- **Decisión:** `TrackingCierre(γ = 0,9, c = 20, horizon = 0,9, pending_penalty = 1)` (`ej4.make_reward`): el seguimiento del
-  ej. 2 contra un TWAP que acaba en 0,9·N, con el cierre y −k·pendiente/n al final. Banda aceptada: 80-95 % del tiempo
-  con el 100 % del volumen. El esqueleto inicial usaba `Tracking` sin cierre (atajo de acabar pronto, D-2.6) y se corrigió.
-- **Calibración previa (políticas fijas, rejilla de train):** dejar el último 5 % sin comprar empeora el seguimiento en
-  6,21 por episodio; el término terminal añade 0,04 (k = 1), 0,41 (k = 10) y 2,07 (k = 50). Con γ = 0,9, el final pesa
-  0,007 visto desde 0,9·N.
-- **Evidencia (`scripts/ej4_ideaB.py`, 7 configuraciones × 3 semillas, 300 episodios):** plan a N (ej. 2) → t/N = 0,988,
-  0 % en banda. Plan a 0,9·N con γ = 0,9 y k ∈ {0, 1, 10, 50} → 100 % completas, t/N = 0,887 ± 0,005, 100 % en banda,
-  error máx. 0,889 en las 3 semillas (= TWAP a 0,9·N); k no cambia nada. γ = 0,995 (G3) empeora: error 2,6-3,3 y, con
-  k = 10, solo 1/3 semillas completa todo. **Test (una vez):** 3/3 semillas 100 % completas, t/N 0,884-0,889, 100 % en banda.
-- **Justificación:** el plan comprimido ya castiga lo pendiente en cada paso del último 10 %; k = 1 deja explícita la
-  penalización que pide el enunciado sin coste. La recomendación de γ alto vale para señales terminales dispersas; aquí la
-  señal es densa (coherente con D-2.3).
-- **Estado:** CERRADA
+- **Fecha:** 2026-11-13 · **Estado:** CERRADA
+- **Decisión:** la recompensa del ej. 2 (seguir el plan, con cierre), pero con un plan que termina al 90 % del tiempo,
+  más un castigo final pequeño por títulos pendientes (k = 1). Se mantiene γ = 0,9. Banda aceptada: 80-95 % del tiempo,
+  con todo comprado.
+- **Por qué:** con el plan al 90 %, las 5 repeticiones compran todo y acaban al 89 % del tiempo, igual en test. El
+  castigo final casi no actúa (k = 0, 1, 10 o 50 dan lo mismo), porque separarse del plan ya cuesta 150 veces más. Subir
+  γ a 0,995 lo empeora: con k = 10 solo 1 de 3 repeticiones completa todo.
 
-### D-4.2 · Idea C: parada por aprendizaje, checkpoints y recuperación
+### D-4.2 · Idea C: parar, guardar y recuperar
 
-- **Fecha:** 2026-11-11 (cerrada 2026-11-13)
-- **Decisión:** `ej4.Trainer` en lugar de `protocol.train` (que no se toca por los hashes de los ej. 1-3). Parada por
-  (a) error ≤ 1,5 títulos en 2 evaluaciones seguidas, (b) 6 evaluaciones sin mejorar 0,05 (más que las 2 del ε por mejora,
-  para no cortar la reexploración) o (c) tope de 600 episodios. Evaluación greedy cada 25 episodios frente al plan de
-  0,9·N; en cada una se guarda `*_last.pt` y, con cualquier mejora, `*_best.pt`. El checkpoint guarda el estado completo:
-  pesos, optimizador, ε, buffer, generadores (agente, entorno, torch), learn_counter, mejor métrica, paciencia y plan de ε.
-  Exploración: ε por mejora, variante d (D-3.4).
-- **Problemas corregidos de `protocol.train`:** `best` se reiniciaba al reanudar (se podía sobrescribir `*_best.pt` con un
-  modelo peor); learn_counter volvía a 0; no se guardaban buffer, generadores ni el plan de ε; el objetivo valía con una sola
-  evaluación.
-- **Evidencia (`scripts/ej4_ideaC.py`, 3 semillas, config. de D-4.1):** parada por objetivo en los episodios 125, 125 y 150
-  (frente a 300), con error final 0,92 / 0,89 / 0,91 (300 episodios sin parada: 0,889). Reanudación: interrumpida en el
-  episodio 60, un agente nuevo con otra semilla carga el checkpoint del 50 y reproduce exactamente la curva, la parada y los
-  pesos. La semilla 2 olvida entre los episodios 25 y 75 (3,8 → 14,1 títulos, 0 % completas en el 75) y `*_best.pt` conserva
-  el modelo del 25. Tests en `common/test_ej4.py`.
-- **Estado:** CERRADA
+- **Fecha:** 2026-11-13 · **Estado:** CERRADA
+- **Decisión:** examen cada 25 episodios. El entrenamiento para si el error baja de 1,5 títulos dos veces seguidas, si
+  lleva 6 exámenes sin mejorar o si llega a 600 episodios. En cada examen se guarda el último modelo y, si es el mejor,
+  una copia aparte. Se guarda todo el estado (red, optimizador, memoria, azar y contadores) con `ej4.Trainer`.
+  `protocol.train` no se toca, porque su hash está en las auditorías de los ej. 1-3; al reanudar perdía la cuenta del
+  mejor modelo y no guardaba la memoria ni el azar.
+- **Por qué:** las 5 repeticiones paran entre los episodios 100 y 150 (en lugar de 300), con un error de 0,89-0,96 frente
+  a 0,89. Al cortar en el episodio 60 y seguir desde lo guardado en el 50 con un agente nuevo, sale exactamente lo mismo.
+  La copia del mejor protegió a la repetición 2 cuando olvidó lo aprendido entre los episodios 25 y 75.
 
+### D-4.3 · Idea A: mirar el mercado para pagar mejor
+
+- **Fecha:** 2026-11-13 · **Estado:** CERRADA
+- **Decisión:** el agente ve además 4 datos del mercado: spread, desbalanceo, tendencia y actividad del último minuto.
+  Todos usan solo el pasado. La recompensa es la de D-4.1 más un premio w · (precio medio − precio pagado). w se elige en
+  validación con una regla fijada antes de mirar: el que más ahorra sin dejar de cumplir la banda; sale w = 0,03. El
+  test se mira una sola vez.
+- **Por qué:** en test ahorra +0,15 ± 0,01 pb por orden frente al TWAP al 90 %. El placebo, con los datos desordenados,
+  ahorra −0,02: la mejora viene de la información. Una regla simple («adelanta una compra si el spread está en el mínimo»)
+  ahorra +0,34 pb pero con una dispersión de 1,11 pb frente a 0,40. Mejora pequeña y real; para ganar a la regla harían
+  falta más datos, como avisa el enunciado.
+
+### D-4.4 · Extra: pasillo en vez de plan fijo
+
+- **Fecha:** 2026-11-13 · **Estado:** CERRADA (se descarta)
+- **Decisión:** probar una recompensa sin castigo dentro de un pasillo entre «acabar al 80 %» y «acabar al 95 %».
+- **Por qué se descarta:** cada repetición elige un punto distinto (80-92 %), pero una se sale de la banda en la mitad de
+  las órdenes y el error frente al plan sube a 1,7-5,6 títulos. El plan fijo es más estable.
+
+### D-4.5 · Extra: robustez
+
+- **Fecha:** 2026-11-13 · **Estado:** CERRADA
+- **Resultado:** con órdenes fuera del rango de entrenamiento (250-800 pasos, 4-20 % del volumen), el agente de D-4.1
+  completa todo y acaba dentro de la banda. Si se le impide comprar durante el 20, 40 o 60 % inicial, se recupera y
+  termina igual que el TWAP.

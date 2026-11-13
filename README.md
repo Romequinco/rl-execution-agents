@@ -8,7 +8,7 @@
 ![PyTorch](https://img.shields.io/badge/PyTorch-CPU-EE4C2C?logo=pytorch&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-unittest-2F9E6E)
 ![Jupyter](https://img.shields.io/badge/Jupyter-notebooks-F37626?logo=jupyter&logoColor=white)
-![Estado](https://img.shields.io/badge/estado-en%20curso-D69E2E)
+![Estado](https://img.shields.io/badge/estado-completo-2F9E6E)
 
 Máster MIAX · Aprendizaje por Refuerzo · Taller 3 · Noviembre 2026<br>
 Óscar Romero Quincoces · Fernando Dapena Tauste · Daniel García López
@@ -21,9 +21,9 @@ Máster MIAX · Aprendizaje por Refuerzo · Taller 3 · Noviembre 2026<br>
 
 ## El problema
 
-Un agente recibe una orden CARE de compra de N títulos y decide, cada 5 segundos, si comprar un título al ask o esperar.
-El objetivo es completar la orden con el menor VWAP slippage frente al mercado. Los datos son snapshots del primer nivel del
-libro de 13:00 a 17:25 (Santander y Repsol), y el punto de partida es el notebook `execution_lab.ipynb` del taller.
+Hay que comprar N títulos de Repsol en un plazo fijo. Cada 5 segundos, un agente decide si compra un título o espera.
+Aprende con aprendizaje por refuerzo (Double DQN) sobre datos reales del libro de órdenes. La referencia es un
+**TWAP**, que compra al mismo ritmo todo el rato.
 
 | Ejercicio | Puntos | Qué se pide |
 |---|---:|---|
@@ -36,15 +36,14 @@ libro de 13:00 a 17:25 (Santander y Repsol), y el punto de partida es el noteboo
 
 | Notebook | Qué hace |
 |---|---|
-| [`00_datos_y_entorno`](notebooks/00_datos_y_entorno.ipynb) | Datos de Repsol, el entorno con sus 13 funciones, invariantes y referencias (TWAP determinista y aleatorio) |
-| [`ej1_execution_lab`](notebooks/ej1_execution_lab.ipynb) | Ej. 1: Double DQN entrena y ejecuta de principio a fin con la recompensa del taller |
-| [`ej2_twap_recompensas`](notebooks/ej2_twap_recompensas.ipynb) | Ej. 2: recompensa de seguimiento del plan con cierre; replica el TWAP en los 27 episodios de la rejilla (error máx. 0,90 títulos, igual que el determinista) y barridos en dos etapas de γ, recorte, buffer y frecuencia de aprendizaje |
-| [`ej3_exploracion`](notebooks/ej3_exploracion.ipynb) | Ej. 3: métrica de mejora, progreso hacia el TWAP, traslado a ε y comparación con el ε lineal en dos escenarios (3 semillas) |
-| [`ej4_extras`](notebooks/ej4_extras.ipynb) | Ej. 4: sin volumen pendiente y ~90 % de la duración (B); parada, checkpoints y recuperación (C) |
+| [`00_datos_y_entorno`](notebooks/00_datos_y_entorno.ipynb) | Los datos, el simulador y las políticas de referencia |
+| [`ej1_execution_lab`](notebooks/ej1_execution_lab.ipynb) | Ej. 1: el agente entrena y ejecuta de principio a fin |
+| [`ej2_twap_recompensas`](notebooks/ej2_twap_recompensas.ipynb) | Ej. 2: una recompensa que hace que el agente copie al TWAP |
+| [`ej3_exploracion`](notebooks/ej3_exploracion.ipynb) | Ej. 3: explorar menos a medida que el agente mejora |
+| [`ej4_extras`](notebooks/ej4_extras.ipynb) | Ej. 4: ideas A, B y C del enunciado y tres extras |
 
-El código está en [`notebooks/common/`](notebooks/common): `env.py` (entorno), `rewards.py`, `agents.py` (DDQN en PyTorch y
-TWAP), `exploration.py`, `protocol.py` (rejilla, métricas, bucle), `plots.py`, `data.py`, `ej3.py` (figuras y ejecuciones del ej. 3), `ej4.py` (ideas B y C del ej. 4: recompensa con plan a 0,9·N, `Trainer` con checkpoints y reanudación), `test_env.py` y `test_ej4.py`. Las decisiones,
-con su justificación, están en [`docs/DECISIONES.md`](docs/DECISIONES.md).
+El código está en [`notebooks/common/`](notebooks/common) y las decisiones, con sus pruebas, en
+[`docs/DECISIONES.md`](docs/DECISIONES.md). Los scripts de `scripts/` lanzan los entrenamientos largos.
 
 ```bash
 pip install -r requirements.txt
@@ -88,16 +87,19 @@ Empezad por [`notebook_partida.md`](docs/teoria/notebook_partida.md).
 
 ## Resultados
 
-Repsol, días de train, evaluación greedy en los 27 episodios de la rejilla (N ∈ {400, 500, 600} × ρ ∈ {0,075; 0,10; 0,125}
-× 3 días). Error de seguimiento en títulos frente al plan TWAP.
+Medidos sobre 27 órdenes fijas de Repsol, salvo que se indique otra cosa. El «error» es cuántos títulos se separa el
+agente, como máximo, del plan que debe seguir; cuanto menor, mejor.
 
 | Ejercicio | Resultado |
 |---|---|
-| Referencia | TWAP determinista: error máx. 0,90, error medio 0,44, 27/27 órdenes completas, acaba al 98 % del tiempo |
-| 1 | Circuito completo con el reward original del LAB, sin penalización terminal. La configuración final (semilla 0) completa 27/27 órdenes en la rejilla de train y 27/27 en la de test; acaba al 10,8 % del tiempo. Error máx. medio en train: 44,37 títulos |
-| 2 | Recompensa de seguimiento con cierre: error máx. 0,90 (igual que el TWAP), error medio 0,27, 27/27 completas, acaba al 99 % del tiempo |
-| 3 | ε por mejora (E0 fijo, escala log) frente al ε lineal, 3 semillas: con la config. final no mejora al lineal (área 1,93 frente a 1,62), aunque baja de 2 títulos antes (episodio 67 frente al 75); con la config. inestable termina en 0,96 frente a 5,65 y reduce el área bajo la curva un 38 % |
-| 4 | B: plan de seguimiento a 0,9·N con cierre y k = 1: 100 % completas y acaba al 88,7 % del tiempo (100 % en la banda 80-95 %, también en test); k no cambia nada y γ = 0,995 lo desestabiliza. C: parada por objetivo en 125-150 episodios en vez de 300 con el mismo error (0,89-0,92), checkpoint completo con reanudación exacta. A: planteada, sin implementar |
+| Referencia | El TWAP completa todas las órdenes y acaba al 98 % del tiempo, con un error de 0,90 |
+| 1 | El agente entrena y ejecuta de principio a fin. Con la recompensa original del taller compra casi todo al principio: acaba al 11 % del tiempo |
+| 2 | Con la recompensa de seguir el plan, copia al TWAP: error de 0,90, igual que el TWAP, y todas las órdenes completas |
+| 3 | Explorar según la mejora ayuda cuando el entrenamiento es inestable (error final de 0,96 frente a 5,65), pero no cuando ya era estable |
+| 4 · B | Con un plan que termina al 90 %, compra todo y acaba al **89 % del tiempo**, igual en 5 repeticiones y en test |
+| 4 · C | Para solo al cumplir el objetivo (100-150 episodios en vez de 300) con el mismo resultado; se puede cortar y seguir exactamente igual |
+| 4 · A | Mirando el mercado ahorra **+0,15 pb** por orden frente al TWAP; un placebo con datos desordenados no ahorra nada. Una regla simple ahorra más (+0,34) pero es casi tres veces más irregular |
+| 4 · extras | Un pasillo 80-95 % en vez de plan fijo da libertad pero menos estabilidad. El agente no falla con órdenes que nunca vio ni empezando tarde |
 
 ## Licencia
 
