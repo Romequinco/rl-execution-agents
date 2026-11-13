@@ -1,0 +1,24 @@
+{
+  "w_elegido": 0.03,
+  "regla": "100 % completas, banda ≥ 95 %, mayor ahorro medio en validación",
+  "validacion": [
+    {
+      "w": 0.0,
+      "completas": 1.0,
+      "en_banda": 1.0,
+      "ahorro": 0.000529271269958726
+    },
+    {
+      "w": 0.01,
+      "completas": 1.0,
+      "en_banda": 1.0,
+      "ahorro": 0.044687345822056426
+    },
+    {
+      "w": 0.03,
+      "completas": 1.0,
+      "en_banda": 1.0,
+      "ahorro": 0.2637751385456646
+    }
+  ]
+}

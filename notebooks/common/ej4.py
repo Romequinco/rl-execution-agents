@@ -78,7 +78,7 @@ def summary(res: pd.DataFrame) -> pd.Series:
         "t_fin": res.t_fin.mean(), "t_fin_std": res.t_fin.std(), "t_fin_min": res.t_fin.min(),
         "t_fin_max": res.t_fin.max(), "en_banda": res.in_band.mean(),
         "max_err_h": res.max_err_h.mean(), "mean_err_h": res.mean_err_h.mean(),
-        "slip_vs_twap_bps": res.slippage_vs_twap_bps.mean()})
+        "slip_vs_twap_bps": (res.slippage_vs_twap_bps if "slippage_vs_twap_bps" in res else res.slip_vs_ref_bps).mean()})
 
 
 class Policy:
