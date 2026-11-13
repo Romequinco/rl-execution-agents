@@ -1,0 +1,42 @@
+{
+  "config": {
+    "horizon": 0.9,
+    "k": 1.0,
+    "gamma": 0.9
+  },
+  "fixed_episodes": 300,
+  "target": 1.5,
+  "target_hits": 2,
+  "patience": 6,
+  "max_episodes": 600,
+  "e_star": 0.8891358024691369,
+  "runs": [
+    {
+      "seed": 0,
+      "stop": "objetivo: 2 evaluaciones seguidas con error ≤ 1.5",
+      "episodes": 125,
+      "seconds": 117.89324879646301
+    },
+    {
+      "seed": 1,
+      "stop": "objetivo: 2 evaluaciones seguidas con error ≤ 1.5",
+      "episodes": 125,
+      "seconds": 119.01929926872253
+    },
+    {
+      "seed": 2,
+      "stop": "objetivo: 2 evaluaciones seguidas con error ≤ 1.5",
+      "episodes": 150,
+      "seconds": 134.23475766181946
+    }
+  ],
+  "demo": {
+    "cut_episode": 60,
+    "checkpoint_episode": 50,
+    "resumed_seed": 7,
+    "curves_equal": true,
+    "weights_equal": true,
+    "stop_resumed": "objetivo: 2 evaluaciones seguidas con error ≤ 1.5",
+    "episodes_resumed": 125
+  }
+}
