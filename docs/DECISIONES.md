@@ -49,10 +49,14 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
 ### D-0.5 · Pruebas sobre los datos reales
 
 - **Fecha:** 2026-11-11
-- **Decisión:** `common/test_env.py` (18 pruebas) usa los días de train de REP. Nada de datos sintéticos.
+- **Decisión:** `common/test_env.py` usa los días de train de REP para comprobar las invariantes y la integración.
 - **Justificación:** las invariantes se comprueban sobre los mismos datos que usan los notebooks. Los datos cumplen lo
   supuesto: claves `datetime.date`, una fila cada 5 s de 13:00 a 17:25 (3.177-3.181 filas), sin NaN y `cumvol` nunca
   decreciente; spread mediano 3,3 pb (un tick de 0,005 € sobre ~15 €).
+- **Ampliación (2026-11-14):** `test_learning.py` comprueba con redes de valores Q conocidos el objetivo
+  Double DQN, los terminales, el MSE, los gradientes y la sincronización. `test_protocol.py` usa episodios
+  controlados para verificar validación y checkpoints. Complementan las pruebas con datos reales;
+  no se utilizan para medir calidad financiera.
 - **Estado:** CERRADA
 
 ---
@@ -89,6 +93,21 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
 - **Decisión:** `TWAPAgent` compra cuando va igual o por detrás del plan (volumen restante ≥ tiempo restante).
 - **Justificación:** es la regla que dio el profesor en clase. En la rejilla sigue el plan con error ≤ 1 título y completa
   todas las órdenes; es el benchmark de los ej. 2-4.
+- **Estado:** CERRADA
+
+### D-1.5 · Validación periódica y selección del mejor modelo
+
+- **Fecha:** 2026-11-14
+- **Decisión:** evaluar sin explorar cada 250 episodios y al final, sobre 27 órdenes fijas de `val` (tres días,
+  tres duraciones y tres proporciones; semilla 0). Mantener las 4.000 iteraciones y la recompensa original.
+  Elegir por mayor completitud, menos títulos pendientes y mayor slippage medio, en ese orden. En empate
+  conservar el primer checkpoint. Un slippage no finito se considera el peor desempate de precio.
+- **Justificación:** conservar una política anterior si el aprendizaje empeora; el precio no debe compensar
+  incumplimiento de la orden. El error frente a TWAP queda como diagnóstico. El conjunto test se evalúa
+  después de elegir el modelo y no participa en la selección.
+- **Artefactos:** `ej1_validation.csv`, `ej1_validation.png`, `ej1_ddqn_best.pt` y `ej1_ddqn_last.pt`.
+  `ej1_ddqn.pt` y las evaluaciones finales corresponden al seleccionado. Se guardan episodio, criterio,
+  métricas y configuración; estos archivos no permiten reanudar exactamente el entrenamiento.
 - **Estado:** CERRADA
 
 ---

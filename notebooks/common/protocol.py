@@ -136,26 +136,54 @@ def fill_buffer(agent, env, n_episodes=25):
     return steps
 
 
+def _checkpoint_score(ev, metric):
+    """Puntuación a maximizar: completitud, menos pendientes y precio, por ese orden.
+
+    No se omiten órdenes sin compras: un slippage no finito es el peor desempate
+    posible. El error TWAP sigue disponible para los otros ejercicios.
+    """
+    if metric == "max_err":
+        return (-float(ev.max_err.mean()),)
+    if metric == "execution":
+        slippage = ev.slippage_bps.to_numpy(dtype=float)
+        price = float(slippage.mean()) if np.isfinite(slippage).all() else -np.inf
+        return (float(ev.completed.mean()), -float(ev.pending.mean()), price)
+    raise ValueError(f"Unknown checkpoint metric: {metric}")
+
+
 def train(agent, env, nepisodes, exploration, learn_after=None, update_target_after=None,
           eval_data=None, eval_grid=None, eval_every=25, eval_reward=None,
           checkpoint=None, stop_patience=None, stop_min_delta=0.05, stop_target=None,
-          start_episode=0, log_every=25, verbose=True):
+          start_episode=0, log_every=25, verbose=True,
+          checkpoint_metric="max_err", checkpoint_config=None):
     """Bucle del notebook original (LAB celda 18) con ganchos para los ejercicios 3 y 4.
 
     - exploration: LinearDecay o ImprovementEpsilon (on_episode_end / on_eval).
     - eval_*: cada ``eval_every`` episodios, evaluación greedy en la rejilla fija; la
       métrica de mejora es el max_err medio.
     - checkpoint: ruta base; guarda el mejor modelo (``*_best.pt``) y el último (``*_last.pt``).
+      También evalúa el episodio final si no coincide con eval_every.
+      ``checkpoint_metric``: max_err (defecto) o execution (más órdenes completas,
+      menos pendientes y mayor slippage, en ese orden). No cambia el reward.
+      ``checkpoint_config`` añade la configuración a ambos archivos.
+      Exploración adaptativa y parada siguen utilizando max_err.
     - stop_patience: parada si la métrica no mejora ``stop_min_delta`` en ese número de
       evaluaciones; stop_target: parada si la métrica baja de ese valor.
     Devuelve (DataFrame por episodio, DataFrame por evaluación).
     """
     learn_after = learn_after or agent.batch_size
     update_target_after = update_target_after or 10 * learn_after
+    if checkpoint_metric not in ("max_err", "execution"):
+        raise ValueError(f"Unknown checkpoint metric: {checkpoint_metric}")
+    if eval_grid is not None and (not eval_grid or eval_data is None or eval_every <= 0):
+        raise ValueError("Evaluation needs data, a nonempty grid and eval_every > 0")
+    if checkpoint and eval_grid is None:
+        raise ValueError("Checkpoint selection needs an evaluation grid")
     agent.set_trainable(True)
     learn_counter, mse = 0, np.nan
     ep_rows, ev_rows = [], []
     best, since_best = np.inf, 0
+    best_score = None
     t0 = time.time()
     for episode in range(start_episode, start_episode + nepisodes):
         s = env.reset()
@@ -183,19 +211,36 @@ def train(agent, env, nepisodes, exploration, learn_after=None, update_target_af
             last = pd.DataFrame(ep_rows[-log_every:])
             print(f"Episode {episode + 1}: steps {last.steps.mean():.0f}, rew {last.reward.mean():.3f}, "
                   f"mse {mse:.4f}, eps {agent.epsilon:.2f}, {time.time() - t0:.0f}s")
-        if eval_grid is not None and not (episode + 1) % eval_every:
+        if eval_grid is not None and (not (episode + 1) % eval_every or
+                                      (checkpoint and episode + 1 == start_episode + nepisodes)):
             ev = evaluate(agent, eval_data, eval_grid, reward=eval_reward, obs_mode=env.obs_mode, with_twap=False)
             metric = float(ev.max_err.mean())
+            score = _checkpoint_score(ev, checkpoint_metric)
+            # El criterio por defecto conserva stop_min_delta para los ejercicios existentes.
+            is_best = (metric < best - stop_min_delta if checkpoint_metric == "max_err"
+                       else best_score is None or score > best_score)
+            if is_best:
+                best_score = score
             exploration.on_eval(agent, metric)
             agent.set_trainable(True)
             ev_rows.append({"episode": episode + 1, "max_err": metric, "mean_err": ev.mean_err.mean(),
-                            "completed": ev.completed.mean(), "epsilon": agent.epsilon})
+                            "completed": ev.completed.mean(), "pending": ev.pending.mean(),
+                            "slippage_bps": ev.slippage_bps.mean(), "return": ev["return"].mean(),
+                            "epsilon": agent.epsilon, "is_best": is_best})
             if checkpoint:
-                agent.save(f"{checkpoint}_last.pt", episode=episode + 1, metric=metric)
+                metadata = dict(episode=episode + 1, metric=metric, checkpoint_metric=checkpoint_metric,
+                                selection_score=score, validation=ev_rows[-1].copy())
+                if checkpoint_config is not None:
+                    metadata["config"] = checkpoint_config
+                agent.save(f"{checkpoint}_last.pt", **metadata)
+                if is_best:
+                    agent.save(f"{checkpoint}_best.pt", **metadata)
+            if verbose:
+                print(f"Eval {episode + 1}: completas {int(ev.completed.sum())}/{len(ev)}, "
+                      f"pendientes {ev.pending.mean():.2f}, slippage {ev.slippage_bps.mean():.3f} pb"
+                      f"{' [mejor modelo]' if is_best else ''}")
             if metric < best - stop_min_delta:
                 best, since_best = metric, 0
-                if checkpoint:
-                    agent.save(f"{checkpoint}_best.pt", episode=episode + 1, metric=metric)
             else:
                 since_best += 1
             if stop_target is not None and metric <= stop_target:

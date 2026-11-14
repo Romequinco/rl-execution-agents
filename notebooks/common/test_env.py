@@ -9,6 +9,7 @@ from functools import lru_cache
 
 import numpy as np
 import pandas as pd
+import torch
 
 from . import exploration as ex
 from . import protocol as pr
@@ -125,6 +126,32 @@ class TestTWAP(unittest.TestCase):
 
 
 class TestAgent(unittest.TestCase):
+    def test_periodic_validation_does_not_change_training(self):
+        data = real_data(2)
+        grid = pr.make_grid(data, Ns=(400,), rhos=(0.1,), n_days=1)
+
+        def trained(with_validation):
+            env = BestExecutionEnv(data, seed=11)
+            agent = DDQNAgent(env, batch_size=4, hidden_neurons=8, seed=11)
+            pr.fill_buffer(agent, env, n_episodes=1)
+            ep, _ = pr.train(agent, env, 3, ex.LinearDecay(0.9, 0.1, nepisodes=3),
+                             eval_data=data if with_validation else None,
+                             eval_grid=grid if with_validation else None,
+                             eval_every=1, checkpoint_metric="execution", verbose=False)
+            return agent, env, ep
+
+        plain, plain_env, plain_ep = trained(False)
+        validated, validated_env, validated_ep = trained(True)
+        pd.testing.assert_frame_equal(plain_ep, validated_ep)
+        for model in ("primary_model", "target_model"):
+            for key, value in getattr(plain, model).state_dict().items():
+                torch.testing.assert_close(value, getattr(validated, model).state_dict()[key], rtol=0, atol=0)
+        self.assertEqual(plain.rng.bit_generator.state, validated.rng.bit_generator.state)
+        self.assertEqual(plain_env.rng.bit_generator.state, validated_env.rng.bit_generator.state)
+        self.assertEqual(len(plain.buffer), len(validated.buffer))
+        self.assertIs(validated.env, validated_env)
+        self.assertTrue(validated._trainable)
+
     def test_fill_learn_eval_checkpoint(self):
         data = real_data(4)
         env = BestExecutionEnv(data, reward=rw.Tracking(), seed=6)

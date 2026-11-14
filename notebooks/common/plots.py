@@ -96,3 +96,25 @@ def plot_training(ep: pd.DataFrame, ev: pd.DataFrame = None, window=20, title="E
     fig.suptitle(title); fig.tight_layout()
     _save(fig, save)
     return fig
+
+
+def plot_validation(ev: pd.DataFrame, title="Validación greedy", save=None):
+    """Progreso en órdenes fijas; estrellas en nuevos mejores modelos."""
+    fig, axes = plt.subplots(1, 3, figsize=(15, 3.6))
+    series = [(100 * ev.completed, "órdenes completas (%)"),
+              (ev.pending, "títulos pendientes (media)"),
+              (ev.slippage_bps, "slippage frente al VWAP (pb, + = mejor)")]
+    for ax, (values, label) in zip(axes, series):
+        ax.plot(ev.episode, values, "o-", color=MKT)
+        mask = ev.is_best.astype(bool)
+        ax.scatter(ev.loc[mask, "episode"], values[mask], marker="*", s=110,
+                   color=ALGO, zorder=3, label="nuevo mejor modelo")
+        ax.set_title(label)
+        ax.set_xlabel("episodio")
+        ax.grid(alpha=0.3)
+    axes[0].set_ylim(-2, 102)
+    axes[0].legend(fontsize=8)
+    fig.suptitle(title)
+    fig.tight_layout()
+    _save(fig, save)
+    return fig

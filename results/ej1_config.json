@@ -29,12 +29,213 @@
   "grid_seed": 0,
   "grid_days": 3,
   "torch_threads": 1,
+  "eval_every": 250,
+  "checkpoint_metric": "execution",
+  "selection_split": "val",
+  "validation_grid": [
+    {
+      "day": "2019-01-28",
+      "start_pos": 171,
+      "n_bins": 400,
+      "vol_care": 30,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-01-28",
+      "start_pos": 171,
+      "n_bins": 400,
+      "vol_care": 40,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-01-28",
+      "start_pos": 171,
+      "n_bins": 400,
+      "vol_care": 50,
+      "rho": 0.125
+    },
+    {
+      "day": "2019-01-28",
+      "start_pos": 257,
+      "n_bins": 500,
+      "vol_care": 37,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-01-28",
+      "start_pos": 257,
+      "n_bins": 500,
+      "vol_care": 50,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-01-28",
+      "start_pos": 257,
+      "n_bins": 500,
+      "vol_care": 62,
+      "rho": 0.125
+    },
+    {
+      "day": "2019-01-28",
+      "start_pos": 101,
+      "n_bins": 600,
+      "vol_care": 45,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-01-28",
+      "start_pos": 101,
+      "n_bins": 600,
+      "vol_care": 60,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-01-28",
+      "start_pos": 101,
+      "n_bins": 600,
+      "vol_care": 75,
+      "rho": 0.125
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 537,
+      "n_bins": 400,
+      "vol_care": 30,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 537,
+      "n_bins": 400,
+      "vol_care": 40,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 537,
+      "n_bins": 400,
+      "vol_care": 50,
+      "rho": 0.125
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 2192,
+      "n_bins": 500,
+      "vol_care": 37,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 2192,
+      "n_bins": 500,
+      "vol_care": 50,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 2192,
+      "n_bins": 500,
+      "vol_care": 62,
+      "rho": 0.125
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 1697,
+      "n_bins": 600,
+      "vol_care": 45,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 1697,
+      "n_bins": 600,
+      "vol_care": 60,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-01-23",
+      "start_pos": 1697,
+      "n_bins": 600,
+      "vol_care": 75,
+      "rho": 0.125
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 2542,
+      "n_bins": 400,
+      "vol_care": 30,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 2542,
+      "n_bins": 400,
+      "vol_care": 40,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 2542,
+      "n_bins": 400,
+      "vol_care": 50,
+      "rho": 0.125
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 1379,
+      "n_bins": 500,
+      "vol_care": 37,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 1379,
+      "n_bins": 500,
+      "vol_care": 50,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 1379,
+      "n_bins": 500,
+      "vol_care": 62,
+      "rho": 0.125
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 1588,
+      "n_bins": 600,
+      "vol_care": 45,
+      "rho": 0.075
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 1588,
+      "n_bins": 600,
+      "vol_care": 60,
+      "rho": 0.1
+    },
+    {
+      "day": "2019-02-04",
+      "start_pos": 1588,
+      "n_bins": 600,
+      "vol_care": 75,
+      "rho": 0.125
+    }
+  ],
   "source_sha256": {
     "env": "054780757624ec4691c5e93990fe8e372a996ce122fcf84a8a5039d34f8149ad",
     "rewards": "2f23d5b22ef6561a8e4cd98456cfcec3e198387ff27158b3545f88f5537486f7",
     "agents": "b10900ef4b5616e88038c82ae248f8f212ca7104c1ed486e2296cc0434e9d970",
-    "protocol": "6bdabbe46e94a9c75b057b18c6026e1b9edccb52ddee66412c83e3a428a37492",
+    "protocol": "0d082b367fb03ff59fdd78cf36edff734d42bd84df9a88ae8a02651ffe6f060d",
     "exploration": "52146398142b9149b456429fc037e8284c8efa53219bedab2323165762e45caa",
-    "data": "2a5028419fd9bc73712e742ecba681782af70bdbd71ff6d67f8c225426b95078"
-  }
+    "data": "2a5028419fd9bc73712e742ecba681782af70bdbd71ff6d67f8c225426b95078",
+    "plots": "10afc5b34e69ab31a8d95c28391aa39b641bd91f5cfdfafae25baf705e6dba7c"
+  },
+  "selected_episode": 750,
+  "selection_score": [
+    1.0,
+    -0.0,
+    -1.0430751386951456
+  ]
 }

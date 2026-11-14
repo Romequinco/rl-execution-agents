@@ -37,7 +37,7 @@ Aprende con aprendizaje por refuerzo (Double DQN) sobre datos reales del libro d
 | Notebook | Qué hace |
 |---|---|
 | [`00_datos_y_entorno`](notebooks/00_datos_y_entorno.ipynb) | Los datos, el simulador y las políticas de referencia |
-| [`ej1_execution_lab`](notebooks/ej1_execution_lab.ipynb) | Ej. 1: el agente entrena y ejecuta de principio a fin |
+| [`ej1_execution_lab`](notebooks/ej1_execution_lab.ipynb) | Ej. 1: entrenamiento, validación cada 250 episodios y selección del mejor modelo |
 | [`ej2_twap_recompensas`](notebooks/ej2_twap_recompensas.ipynb) | Ej. 2: una recompensa que hace que el agente copie al TWAP |
 | [`ej3_exploracion`](notebooks/ej3_exploracion.ipynb) | Ej. 3: explorar menos a medida que el agente mejora |
 | [`ej4_extras`](notebooks/ej4_extras.ipynb) | Ej. 4: ideas A, B y C del enunciado y tres extras |
@@ -48,12 +48,15 @@ El código está en [`notebooks/common/`](notebooks/common) y las decisiones, co
 ```bash
 pip install -r requirements.txt
 cd notebooks
-python -m unittest common.test_env common.test_ej4 -v
+python -m unittest common.test_env common.test_learning common.test_protocol common.test_ej4 -v
 jupyter lab
 ```
 
-Los notebooks guardan CSV, figuras y modelos en `results/` y los reutilizan: si un resultado ya existe no se vuelve a
-entrenar (bórralo para recalcularlo).
+Los notebooks guardan CSV, figuras y modelos en `results/`; algunos reutilizan resultados existentes.
+El ejercicio 1 vuelve a entrenar al ejecutar su celda de entrenamiento. Guarda el progreso en
+`ej1_validation.csv`, el mejor modelo en `models/ej1_ddqn_best.pt` y el último en `models/ej1_ddqn_last.pt`.
+Selecciona con datos de validación, priorizando órdenes completas, menos pendientes y mejor slippage,
+por ese orden. `models/ej1_ddqn.pt` corresponde al seleccionado; test solo se evalúa después de elegirlo.
 
 ## Estructura
 
