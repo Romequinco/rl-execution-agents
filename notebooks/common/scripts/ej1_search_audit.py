@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]
 OUT = ROOT / "results" / "ej1_search"
 
 
@@ -101,8 +101,8 @@ def main():
               "Se auditan los 28 entrenamientos (74 000 episodios): presupuestos, resultados finitos, identidad del reward y hashes de código y datos. Las tres semillas de la base y de alpha bajo reproducen exactamente los entrenamientos anteriores. El modelo actual coincide con el confirmado de la base/semilla 0 y el notebook ejecutado sigue válido. Los 18 tests existentes han pasado durante esta búsqueda.", "",
               "Es una búsqueda de factores individuales con criba en una semilla y confirmación en tres. No se prueban todas las combinaciones ni se demuestra un óptimo global. La completitud observada está limitada a los episodios evaluados. El error de seguimiento TWAP no se utiliza para seleccionar parámetros del ejercicio 1.", "",
               "Cada ejecución conserva entrenamiento, evaluación y checkpoint. Reproducir desde la raíz:", "", "```powershell",
-              "..\\.venv\\Scripts\\python.exe scripts/ej1_search.py",
-              "..\\.venv\\Scripts\\python.exe scripts/ej1_search_audit.py", "```", ""]
+              "..\\.venv\\Scripts\\python.exe notebooks/common/scripts/ej1_search.py",
+              "..\\.venv\\Scripts\\python.exe notebooks/common/scripts/ej1_search_audit.py", "```", ""]
     (OUT / "RESUMEN.md").write_text("\n".join(lines), encoding="utf-8")
     print("Auditoria completa: 28 entrenamientos; reward y fuentes intactos; modelo y notebook confirmados.")
     print(comp.to_string(index=False))

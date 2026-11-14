@@ -9,7 +9,7 @@ Sobre la configuración elegida en la idea B y con el ε por mejora del ej. 3 (v
    comprueba que la curva y los pesos coinciden con el entrenamiento sin interrumpir.
 4. Sin parada: las mismas semillas durante FIXED episodios, para comparar mejor y último cuando el
    entrenamiento sigue después de alcanzar el objetivo.
-Reproducir desde la raíz: python scripts/ej4_ideaC.py --horizon 0.9 --k 1 --gamma 0.9
+Reproducir desde la raíz: python notebooks/common/scripts/ej4_ideaC.py --horizon 0.9 --k 1 --gamma 0.9
 """
 import argparse
 import json
@@ -18,7 +18,7 @@ import time
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "notebooks"))
 
 import pandas as pd  # noqa: E402

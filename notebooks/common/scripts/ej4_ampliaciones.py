@@ -7,13 +7,13 @@
    placebo (variables barajadas) con w ∈ {0,01; 0,03}, 3 semillas, selección en validación (270 episodios).
    Regla fijada antes de mirar: entre los w reales que completan el 100 % y quedan en banda ≥ 95 %,
    el de mayor ahorro medio frente al TWAP a 0,9·N. Test una sola vez con el elegido, su placebo y las referencias.
-Reproducir desde la raíz: python scripts/ej4_ampliaciones.py
+Reproducir desde la raíz: python notebooks/common/scripts/ej4_ampliaciones.py
 """
 import sys
 import time
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "notebooks"))
 
 import pandas as pd  # noqa: E402

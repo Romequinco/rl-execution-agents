@@ -63,6 +63,6 @@ Es una búsqueda de factores individuales con criba en una semilla y confirmaci�
 Cada ejecución conserva entrenamiento, evaluación y checkpoint. Reproducir desde la raíz:
 
 ```powershell
-..\.venv\Scripts\python.exe scripts/ej1_search.py
-..\.venv\Scripts\python.exe scripts/ej1_search_audit.py
+..\.venv\Scripts\python.exe notebooks/common/scripts/ej1_search.py
+..\.venv\Scripts\python.exe notebooks/common/scripts/ej1_search_audit.py
 ```

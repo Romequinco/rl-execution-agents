@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT / "notebooks"))
 from common import data as dt, exploration as ex, protocol as pr, rewards as rw
 from common.agents import DDQNAgent, TWAPAgent

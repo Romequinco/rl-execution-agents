@@ -40,6 +40,10 @@ def plot_results(env, title=None, mode="max", save=None):
     ax2.bar(mkt_vol.index, norm_mkt_vol * 0.3, width=width, color=MKT, alpha=0.4, label="vol. mercado")
     ax2.bar(my_df.index, (my_df["vol"] > 0) * 0.1, width=width, color=ALGO, alpha=0.8, label="compras algo")
     ax2.legend(loc="upper left"); ax2.grid(alpha=0.3)
+    ax1.set_ylabel("precio (€)"); ax2.set_ylabel("fracción del total")
+    if isinstance(mkt_vol.index, pd.DatetimeIndex):
+        import matplotlib.dates as mdates
+        ax2.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m %H:%M"))
     fig.tight_layout()
     _save(fig, save)
     return fig

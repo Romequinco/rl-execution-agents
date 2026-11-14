@@ -232,7 +232,7 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
   ε_min, 300 episodios y evaluación cada 25 (también para el lineal). 3 semillas. Escenario A = config. final del ej. 2;
   B = config. de partida (`Tracking` c = 5, buffer 50.000), inestable.
 - **Evidencia (E final / área bajo la curva, media de 3 semillas):** A: lineal 0,90 ± 0,00 / 1,62; mejora 0,96 ± 0,09 / 3,44
-  (≤ 2 títulos en el episodio 75 frente al 92). B: lineal 5,65 ± 8,18 / 22,3; mejora 1,07 ± 0,28 / 13,1 (3/3 semillas ≤ 2
+  (el lineal baja de 2 títulos en el episodio 75; la variante a, en el 92). B: lineal 5,65 ± 8,18 / 22,3; mejora 1,07 ± 0,28 / 13,1 (3/3 semillas ≤ 2
   frente a 2/3). ε por mejora ayuda cuando el aprendizaje es inestable y es algo más lento cuando el agente aprende rápido,
   por el arranque con ε = 1 que impone E0 (D-3.2).
 - **Variantes de E0 (punto 5, 3 semillas; E final / área / episodio con E ≤ 2):** A: c (E0 fijo, lineal) 0,92 / 2,05 / 83;
@@ -252,8 +252,9 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
   más un castigo final pequeño por títulos pendientes (k = 1). Se mantiene γ = 0,9. Banda aceptada: 80-95 % del tiempo,
   con todo comprado.
 - **Por qué:** con el plan al 90 %, las 5 repeticiones compran todo y acaban al 89 % del tiempo, igual en test. El
-  castigo final casi no actúa (k = 0, 1, 10 o 50 dan lo mismo), porque separarse del plan ya cuesta 150 veces más. Subir
-  γ a 0,995 lo empeora: con k = 10 solo 1 de 3 repeticiones completa todo.
+  castigo final casi no actúa (k = 0, 1, 10 o 50 dan lo mismo), porque separarse del plan ya cuesta 150 veces más y el
+  cierre heredado del ej. 2 ya cobra lo pendiente; k = 1 se deja como red barata. Subir γ a 0,995 lo empeora: con
+  k = 10 solo 1 de 3 repeticiones completa todo. Calibrar k importa: demasiado castigo es peor que ninguno.
 
 ### D-4.2 · Idea C: parar, guardar y recuperar
 
@@ -271,20 +272,22 @@ o `CERRADA`. Las decisiones se añaden al final de su bloque. La base teórica d
 
 - **Fecha:** 2026-11-13 · **Estado:** CERRADA
 - **Decisión:** el agente ve además 4 datos del mercado: spread, desbalanceo, tendencia y actividad del último minuto.
-  Todos usan solo el pasado. La recompensa es la de D-4.1 más un premio w · (precio medio − precio pagado). w se elige en
+  Todos usan solo el pasado. La recompensa es la de D-4.1 más w · (mid − precio pagado) / mid en pb: como se compra al ask, es
+  un castigo proporcional al medio spread pagado, que empuja a comprar cuando el spread es estrecho. w se elige en
   validación con una regla fijada antes de mirar: el que más ahorra sin dejar de cumplir la banda; sale w = 0,03. El
   test se mira una sola vez.
 - **Por qué:** en test ahorra +0,15 ± 0,01 pb por orden frente al TWAP al 90 %. El placebo, con los datos desordenados,
   ahorra −0,02: la mejora viene de la información. Una regla simple («adelanta una compra si el spread está en el mínimo»)
-  ahorra +0,34 pb pero con una dispersión de 1,11 pb frente a 0,40. Mejora pequeña y real; para ganar a la regla harían
+  ahorra +0,34 pb pero con una dispersión de 1,11 pb frente a 0,40. Frente al VWAP del mercado, el slippage del agente
+  es −2,19 ± 4,71 pb, el del TWAP −2,34 ± 4,85 y el de la regla −2,00 ± 5,41. Mejora pequeña y real; para ganar a la regla harían
   falta más datos, como avisa el enunciado.
 
 ### D-4.4 · Extra: pasillo en vez de plan fijo
 
 - **Fecha:** 2026-11-13 · **Estado:** CERRADA (se descarta)
 - **Decisión:** probar una recompensa sin castigo dentro de un pasillo entre «acabar al 80 %» y «acabar al 95 %».
-- **Por qué se descarta:** cada repetición elige un punto distinto (80-92 %), pero una se sale de la banda en la mitad de
-  las órdenes y el error frente al plan sube a 1,7-5,6 títulos. El plan fijo es más estable.
+- **Por qué se descarta:** cada repetición elige un punto distinto (80-92 %), pero una se sale de la banda en más de la
+  mitad de las órdenes (56 %) y el error frente al plan sube a 1,7-5,6 títulos. El plan fijo es más estable.
 
 ### D-4.5 · Extra: robustez
 

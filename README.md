@@ -32,7 +32,18 @@ Aprende con aprendizaje por refuerzo (Double DQN) sobre datos reales del libro d
 | 3 | 1,5 | Exploración (ε) que baje según la mejora del agente, no según el número de episodios |
 | 4 | 1,5 | Mejora libre: libro de órdenes, volumen pendiente y uso del ~90 % del tiempo, early stopping y checkpoints |
 
-## Notebooks
+## Entrega
+
+**[`notebooks/execution_lab.ipynb`](notebooks/execution_lab.ipynb)** es el notebook de entrega: el `execution_lab` del
+taller completado, con los cuatro ejercicios en un solo sitio y ya ejecutado. Conserva intacto el texto del profesor.
+El Ej. 1 ocupa los huecos del propio LAB; los ejercicios 2, 3 y 4 van detrás, cada uno con una tabla de qué se pide,
+qué hacemos y qué sale, figuras y una conclusión. Cada bloque que cambia respecto al LAB lleva la marca
+`🔧 Bloque modificado · Ej. N`. Se ejecuta entero en unos 3 minutos: el Ej. 1 entrena en directo y los demás leen
+`results/`. No escribe nada en el repositorio.
+
+## Notebooks de detalle
+
+Un notebook por ejercicio, con todo el desarrollo, las pruebas y los barridos que resume la entrega.
 
 | Notebook | Qué hace |
 |---|---|
@@ -40,10 +51,11 @@ Aprende con aprendizaje por refuerzo (Double DQN) sobre datos reales del libro d
 | [`ej1_execution_lab`](notebooks/ej1_execution_lab.ipynb) | Ej. 1: entrenamiento, validación cada 250 episodios y selección del mejor modelo |
 | [`ej2_twap_recompensas`](notebooks/ej2_twap_recompensas.ipynb) | Ej. 2: una recompensa que hace que el agente copie al TWAP |
 | [`ej3_exploracion`](notebooks/ej3_exploracion.ipynb) | Ej. 3: explorar menos a medida que el agente mejora |
-| [`ej4_extras`](notebooks/ej4_extras.ipynb) | Ej. 4: ideas A, B y C del enunciado y tres extras |
+| [`ej4_extras`](notebooks/ej4_extras.ipynb) | Ej. 4: ideas A, B y C del enunciado y dos extras (pasillo y robustez) |
 
-El código está en [`notebooks/common/`](notebooks/common) y las decisiones, con sus pruebas, en
-[`docs/DECISIONES.md`](docs/DECISIONES.md). Los scripts de `scripts/` lanzan los entrenamientos largos.
+El código está en [`notebooks/common/`](notebooks/common) (`lab.py` reúne el estilo y las tarjetas de cifras del notebook
+de entrega) y las decisiones, con sus pruebas, en [`docs/DECISIONES.md`](docs/DECISIONES.md). Los scripts de
+[`notebooks/common/scripts/`](notebooks/common/scripts) lanzan los entrenamientos largos.
 
 ```bash
 pip install -r requirements.txt
@@ -52,8 +64,9 @@ python -m unittest common.test_env common.test_learning common.test_protocol com
 jupyter lab
 ```
 
-Los notebooks guardan CSV, figuras y modelos en `results/`; algunos reutilizan resultados existentes.
-El ejercicio 1 vuelve a entrenar al ejecutar su celda de entrenamiento. Guarda el progreso en
+Los notebooks de detalle guardan CSV, figuras y modelos en `results/`; algunos reutilizan resultados existentes.
+El de entrega no escribe nada: sus checkpoints van a una carpeta temporal.
+El notebook de detalle del ejercicio 1 vuelve a entrenar al ejecutar su celda de entrenamiento. Guarda el progreso en
 `ej1_validation.csv`, el mejor modelo en `models/ej1_ddqn_best.pt` y el último en `models/ej1_ddqn_last.pt`.
 Selecciona con datos de validación, priorizando órdenes completas, menos pendientes y mejor slippage,
 por ese orden. `models/ej1_ddqn.pt` corresponde al seleccionado; test solo se evalúa después de elegirlo.
@@ -96,12 +109,12 @@ agente, como máximo, del plan que debe seguir; cuanto menor, mejor.
 | Ejercicio | Resultado |
 |---|---|
 | Referencia | El TWAP completa todas las órdenes y acaba al 98 % del tiempo, con un error de 0,90 |
-| 1 | El agente entrena y ejecuta de principio a fin. Con la recompensa original del taller compra casi todo al principio: acaba al 11 % del tiempo |
+| 1 | El agente entrena y ejecuta de principio a fin y completa todas las órdenes. Con la recompensa original del taller compra mucho antes que el TWAP: acaba hacia el 20-35 % del tiempo (el modelo elegido varía con la versión de PyTorch), porque esa recompensa no dice nada del reparto en el tiempo |
 | 2 | Con la recompensa de seguir el plan, copia al TWAP: error de 0,90, igual que el TWAP, y todas las órdenes completas |
 | 3 | Explorar según la mejora ayuda cuando el entrenamiento es inestable (error final de 0,96 frente a 5,65), pero no cuando ya era estable |
 | 4 · B | Con un plan que termina al 90 %, compra todo y acaba al **89 % del tiempo**, igual en 5 repeticiones y en test |
-| 4 · C | Para solo al cumplir el objetivo (100-150 episodios en vez de 300) con el mismo resultado; se puede cortar y seguir exactamente igual |
-| 4 · A | Mirando el mercado ahorra **+0,15 pb** por orden frente al TWAP; un placebo con datos desordenados no ahorra nada. Una regla simple ahorra más (+0,34) pero es casi tres veces más irregular |
+| 4 · C | Para solo al cumplir el objetivo (100-150 episodios en vez de 300) con casi el mismo error (0,92 frente a 0,89); se puede cortar y seguir exactamente igual |
+| 4 · A | Mirando el mercado ahorra **+0,15 pb** por orden frente al TWAP al 90 %; un placebo con datos desordenados no ahorra nada. Una regla simple ahorra más (+0,34) pero es casi tres veces más irregular |
 | 4 · extras | Un pasillo 80-95 % en vez de plan fijo da libertad pero menos estabilidad. El agente no falla con órdenes que nunca vio ni empezando tarde |
 
 ## Licencia
