@@ -1,0 +1,31 @@
+<section class="slide">
+  <div class="kicker">Ejercicio 4 · Mejoras del entorno y del entrenamiento</div>
+  <h1>Acabar al 90 %, parar antes de tiempo y mirar el mercado</h1>
+  <div class="row" style="gap:3mm; flex:1; min-height:0">
+    <div class="box o col idea">
+      <div class="tag">Idea B · Acabar al 90 % sin dejar volumen</div>
+      <div class="que">Plan que termina en 0,9·N y castigo final −k · pendiente / n.</div>
+      <img class="fig" src="figs/04_ej4_B.png" alt="Cuándo termina cada orden">
+      <div class="res"><div class="v">88,7 %</div><div class="note">del tiempo · 100 % completas y en banda, también en test</div></div>
+      <div>Lo decide el plan, no k. Con γ 0,995 y k = 10 solo completa el 33 %: demasiado castigo es peor que ninguno.</div>
+    </div>
+    <div class="box g col idea">
+      <div class="tag">Idea C · Parar a tiempo y reanudar</div>
+      <div class="que">Examen cada 25 episodios; para por objetivo (E&nbsp;≤&nbsp;1,5 dos veces), estancamiento o tope.</div>
+      <img class="fig" src="figs/04_ej4_C.png" alt="Parada por objetivo en 5 semillas">
+      <div class="res"><div class="v">130 <small>de 300</small></div><div class="note">episodios de media · error 0,92 frente a 0,89 sin parar</div></div>
+      <div>El checkpoint guarda red, optimizador, memoria y azar: al reanudar, <b>curvas y pesos idénticos</b>.</div>
+    </div>
+    <div class="box col idea">
+      <div class="tag">Idea A · Mirar el mercado y pagar menos</div>
+      <div class="que">Estado + spread, desbalanceo, tendencia y actividad (solo pasado); castigo por el medio spread pagado.</div>
+      <img class="fig" src="figs/04_ej4_A.png" alt="Ahorro en test frente al TWAP al 90 %">
+      <div class="res"><div class="v">+0,15 pb</div><div class="note">por orden frente al TWAP al 90 % · placebo: −0,02</div></div>
+      <div>La mejora viene de la información. La regla simple ahorra más (+0,34), pero con casi el triple de dispersión.</div>
+    </div>
+  </div>
+  <div class="row" style="gap:3mm; margin-top:2.5mm; font-size:9.8pt; line-height:1.22">
+    <div class="verdict warn" style="flex:1; font-size:9.8pt"><b>Extra · Pasillo 80-95 %.</b> Sin castigo dentro del pasillo, cada semilla elige su punto (80 % a 92 %), pero una se sale de la banda en más de la mitad de las órdenes: nos quedamos con el plan fijo.</div>
+    <div class="verdict" style="flex:1; font-size:9.8pt"><b>Extra · Robustez.</b> Órdenes nunca vistas (250-800 pasos, 4-20 % del volumen) y sin poder comprar hasta el 60 % inicial: <b>100 % completas y dentro de la banda</b>, como el TWAP.</div>
+  </div>
+</section>

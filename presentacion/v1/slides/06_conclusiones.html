@@ -1,0 +1,36 @@
+<section class="slide">
+  <div class="kicker">Conclusiones</div>
+  <h1>La recompensa decide el comportamiento; el mercado añade poco</h1>
+  <div class="row" style="gap:2.5mm; margin-bottom:3mm">
+    <div class="kpi bad"><div class="l">Ej. 1 · Recompensa del LAB</div><div class="v">21 %</div><div class="n">del plazo: compra todo al principio</div></div>
+    <div class="kpi ok"><div class="l">Ej. 2 · Seguimiento + cierre</div><div class="v">0,90 <small>= TWAP</small></div><div class="n">títulos de error; 27/27 órdenes completas</div></div>
+    <div class="kpi ok"><div class="l">Ej. 3 · ε por mejora</div><div class="v">0,96 <small>vs 5,65</small></div><div class="n">error final en el entrenamiento inestable</div></div>
+    <div class="kpi ok"><div class="l">Ej. 4 · Ideas B y C</div><div class="v">88,7 % <small>· 130 ep.</small></div><div class="n">acaba en banda; para antes de los 300</div></div>
+    <div class="kpi o"><div class="l">Ej. 4 · Idea A</div><div class="v">+0,15 pb</div><div class="n">de ahorro frente al TWAP; placebo: −0,02</div></div>
+  </div>
+  <div class="row" style="gap:6mm; flex:1; min-height:0">
+    <div class="col" style="width:104mm; justify-content:center">
+      <img class="fig" src="figs/05_resumen.png" alt="Error frente al plan por recompensa">
+    </div>
+    <div class="col" style="flex:1; font-size:11.5pt; line-height:1.28; justify-content:space-between">
+      <div>
+        <div class="tag" style="font-size:10pt">Mensajes clave</div>
+        <ul>
+          <li>Con el mismo estado y la misma red, <b>cambiar la recompensa</b> lleva de comprar todo de golpe a replicar el TWAP.</li>
+          <li>El <b>cierre</b> y un γ corto son lo que evita el atajo de acabar pronto.</li>
+          <li>Un <b>examen fijo sin exploración</b> sirve para tres cosas: elegir modelo, gobernar ε y decidir cuándo parar.</li>
+          <li>Mirar el mercado da una mejora <b>real pero pequeña</b>; una regla simple compite con el agente.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="tag" style="font-size:10pt; color:#888">Limitaciones y trabajo futuro</div>
+        <ul style="color:#333">
+          <li>Pocas semillas (3 a 5): harían falta más para afirmar las diferencias pequeñas.</li>
+          <li>Simulador sin impacto ni latencia, y solo Repsol.</li>
+          <li>Siguiente paso: libro a 3 niveles y órdenes de tamaño variable.</li>
+        </ul>
+      </div>
+      <p style="text-align:right; font-size:15pt; color:#102a43; margin:0">Preguntas</p>
+    </div>
+  </div>
+</section>

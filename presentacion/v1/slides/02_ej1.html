@@ -1,0 +1,25 @@
+<section class="slide">
+  <div class="kicker">Ejercicio 1 · Completar el LAB y entrenar de principio a fin</div>
+  <h1>El circuito funciona, pero la recompensa del LAB no reparte</h1>
+  <div class="row" style="gap:1mm; font-size:9.2pt; line-height:1.2; margin-bottom:2mm">
+    <div class="box" style="flex:1.05"><div class="tag">Datos</div>Repsol, libro a 5 s<br>60 días train,<br>30 val y 30 test</div>
+    <div class="arrow">→</div>
+    <div class="box" style="flex:1.05"><div class="tag">Episodio</div>400-600 pasos<br>orden: 7,5-12,5 %<br>de los pasos</div>
+    <div class="arrow">→</div>
+    <div class="box" style="flex:0.95"><div class="tag">Estado</div><b>[T, V]</b>: tiempo<br>y volumen<br>restantes</div>
+    <div class="arrow">→</div>
+    <div class="box" style="flex:0.95"><div class="tag">Acción</div>esperar o<br>comprar 1 título<br>al <i>ask</i></div>
+    <div class="arrow">→</div>
+    <div class="box r" style="flex:1.15"><div class="tag">Recompensa LAB</div>(VWAP − precio)<br>/ VWAP si compra;<br>0 si espera</div>
+    <div class="arrow">→</div>
+    <div class="box g" style="flex:1.75"><div class="tag">Double DQN (PyTorch)</div>act → step → memoria → learn<br>red 2-64-64-2 · buffer 50.000<br>ε 1 → 0,02 · 4.000 episodios</div>
+  </div>
+  <img class="fig" src="figs/01_ej1.png" alt="Episodio, 27 órdenes y validación del Ej. 1">
+  <div class="row" style="margin-top:2mm; gap:2mm">
+    <div class="kpi ok"><div class="l">Órdenes completas</div><div class="v">27/27</div><div class="n">en train y en test</div></div>
+    <div class="kpi bad"><div class="l">Plazo consumido</div><div class="v">21 %</div><div class="n">TWAP: 98 %</div></div>
+    <div class="kpi bad"><div class="l">Error frente al plan</div><div class="v">39,4</div><div class="n">títulos · TWAP: 0,90</div></div>
+    <div class="kpi bad"><div class="l">Slippage vs VWAP</div><div class="v">−4,67 pb</div><div class="n">TWAP: −1,77 pb</div></div>
+    <div class="verdict warn" style="flex:2.4; font-size:10pt; line-height:1.22"><b>Por qué.</b> La recompensa compara cada compra con el VWAP de todo el episodio, que [T, V] no deja anticipar, y no premia repartir: la política oscila entre comprar todo y no comprar nada.</div>
+  </div>
+</section>

@@ -1,0 +1,247 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Aprendizaje por refuerzo para algoritmos de ejecución</title><style>
+@page { size: 254mm 142.875mm; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: Cambria, Georgia, "Times New Roman", serif; color: #111; }
+.slide { width: 254mm; height: 142.875mm; padding: 7mm 12mm 9mm; position: relative; overflow: hidden;
+         break-after: page; display: flex; flex-direction: column; font-size: 11pt; line-height: 1.25; }
+.slide h1 { font-size: 20pt; margin: 0 0 2mm; font-weight: bold; color: #102a43; line-height: 1.1; }
+.slide .kicker { font-size: 10pt; color: #2B6CB0; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 0.8mm; }
+.slide .lead { font-size: 13pt; color: #333; margin: 0 0 3mm; }
+.slide p { margin: 0 0 1.5mm; }
+.slide ul { margin: 0; padding-left: 5mm; }
+.slide li { margin: 0 0 1.2mm; }
+.slide b, .slide strong { color: #102a43; }
+.row { display: flex; gap: 3mm; align-items: stretch; }
+.col { display: flex; flex-direction: column; min-width: 0; }
+.fig { width: 100%; display: block; }
+.cap { font-size: 9pt; color: #555; margin: 0.8mm 0 0; }
+.note { font-size: 9.5pt; color: #555; }
+.tag { font-size: 9pt; color: #2B6CB0; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 0.6mm; }
+.box { border: 0.8pt solid #9fb3c8; border-top: 1.2mm solid #2B6CB0; padding: 1.5mm 2.5mm; background: #fff; }
+.box.g { border-top-color: #2F9E6E; } .box.g .tag { color: #2F9E6E; }
+.box.o { border-top-color: #D9822B; } .box.o .tag { color: #B8691A; }
+.box.r { border-top-color: #C53030; } .box.r .tag { color: #C53030; }
+.arrow { align-self: center; color: #2B6CB0; font-size: 15pt; line-height: 1; }
+.kpi { flex: 1; border: 0.8pt solid #9fb3c8; border-radius: 1.5mm; padding: 1.5mm 2.5mm; background: #f7fafc; }
+.kpi .l { font-size: 9pt; color: #555; }
+.kpi .v { font-size: 17pt; font-weight: bold; color: #2B6CB0; line-height: 1.05; }
+.kpi .v small { font-size: 10pt; white-space: nowrap; color: #555; font-weight: normal; }
+.kpi .n { font-size: 9pt; color: #555; }
+.kpi.bad .v { color: #C53030; } .kpi.ok .v { color: #2F9E6E; } .kpi.o .v { color: #D9822B; }
+.verdict { border-left: 2.2mm solid #2F9E6E; padding: 1.5mm 3mm; background: #f1f8f4; font-size: 11pt; }
+.verdict.warn { border-left-color: #D9822B; background: #fdf6ee; }
+.par { flex: 1; padding: 1.2mm 2.2mm; }
+.par .pv { font-size: 13pt; font-weight: bold; color: #2F9E6E; line-height: 1.15; white-space: nowrap; }
+.par .pv s { color: #C53030; text-decoration: none; font-weight: normal; }
+.par .pv small { font-size: 9pt; color: #555; font-weight: normal; }
+.idea { flex: 1; font-size: 9.8pt; line-height: 1.22; justify-content: space-between; }
+.idea .tag { letter-spacing: .02em; white-space: nowrap; }
+.idea .que { min-height: 8.6mm; }
+.idea .res { display: flex; align-items: baseline; gap: 2.5mm; }
+.idea .res .v { font-size: 17pt; font-weight: bold; color: #2F9E6E; line-height: 1.05; white-space: nowrap; }
+.idea .res .v small { font-size: 10pt; color: #555; font-weight: normal; }
+.f { font-family: "Cambria Math", Cambria, serif; font-style: italic; }
+table { border-collapse: collapse; width: 100%; font-size: 9.5pt; border-top: 1pt solid #000; border-bottom: 1pt solid #000; }
+thead th { border-bottom: 0.6pt solid #000; font-weight: normal; color: #555; }
+th, td { padding: 0.9mm 1.5mm; text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+td.win { background: #d6efe2; font-weight: bold; color: #102a43; }
+td.near { background: #fbe9d2; }
+.num { position: absolute; right: 12mm; bottom: 3mm; font-size: 8.5pt; color: #888; }
+.foot { position: absolute; left: 12mm; bottom: 3mm; font-size: 8.5pt; color: #888; }
+.title { justify-content: center; padding-top: 9mm; }
+.title h1 { font-size: 30pt; }
+</style></head><body><section class="slide title" style="justify-content:flex-start; padding:9mm 12mm 8mm">
+  <div class="kicker">Máster MIAX · Aprendizaje por Refuerzo · Taller 3</div>
+  <h1 style="margin-bottom:1.5mm; font-size:25pt; white-space:nowrap">Aprendizaje por refuerzo para algoritmos de ejecución</h1>
+  <p class="lead" style="margin-bottom:3.5mm">Double DQN que trocea una orden grande de Repsol: del LAB a un TWAP aprendido, y un paso más allá</p>
+  <div class="row" style="gap:6mm; flex:1; min-height:0; margin-bottom:3mm">
+    <div class="col" style="width:140mm">
+      <img src="figs/00_portada.png" style="width:140mm; display:block" alt="27 órdenes con la recompensa del LAB y con la nuestra">
+      <p class="cap">Las mismas 27 órdenes de compra, la misma red y el mismo estado [T, V]: solo cambia la recompensa.</p>
+    </div>
+    <div class="col" style="flex:1; justify-content:space-between">
+      <p style="font-size:16pt; font-style:italic; color:#102a43; margin:0; padding-left:4mm; border-left:1.2mm solid #2B6CB0; line-height:1.2">¿Puede un DQN aprender a ejecutar como un TWAP… y mejorarlo?</p>
+      <div class="box r" style="font-size:10pt; padding:1.6mm 2.5mm"><div class="tag">Ejercicio 1</div>Entrenamiento y ejecución completos del LAB</div>
+      <div class="box o" style="font-size:10pt; padding:1.6mm 2.5mm"><div class="tag">Ejercicio 2</div>Una recompensa que lo convierte en un TWAP</div>
+      <div class="box" style="font-size:10pt; padding:1.6mm 2.5mm"><div class="tag">Ejercicio 3</div>ε según la mejora, no según los episodios</div>
+      <div class="box g" style="font-size:10pt; padding:1.6mm 2.5mm"><div class="tag">Ejercicio 4</div>Acabar al 90 %, parar antes, mirar el mercado</div>
+    </div>
+  </div>
+  <div style="border-top:0.6pt solid #999; padding-top:2mm">
+    <p style="font-size:13pt; margin:0 0 1mm">Óscar Romero Quincoces · Fernando Dapena Tauste · Daniel García López</p>
+    <p class="note" style="margin:0">Noviembre 2026 · Código y resultados: <a href="https://github.com/Romequinco/rl-execution-agents" style="color:#2B6CB0">github.com/Romequinco/rl-execution-agents</a></p>
+  </div>
+</section>
+<section class="slide">
+  <div class="kicker">Ejercicio 1 · Completar el LAB y entrenar de principio a fin</div>
+  <h1>El circuito funciona, pero la recompensa del LAB no reparte</h1>
+  <div class="row" style="gap:1mm; font-size:9.2pt; line-height:1.2; margin-bottom:2mm">
+    <div class="box" style="flex:1.05"><div class="tag">Datos</div>Repsol, libro a 5 s<br>60 días train,<br>30 val y 30 test</div>
+    <div class="arrow">→</div>
+    <div class="box" style="flex:1.05"><div class="tag">Episodio</div>400-600 pasos<br>orden: 7,5-12,5 %<br>de los pasos</div>
+    <div class="arrow">→</div>
+    <div class="box" style="flex:0.95"><div class="tag">Estado</div><b>[T, V]</b>: tiempo<br>y volumen<br>restantes</div>
+    <div class="arrow">→</div>
+    <div class="box" style="flex:0.95"><div class="tag">Acción</div>esperar o<br>comprar 1 título<br>al <i>ask</i></div>
+    <div class="arrow">→</div>
+    <div class="box r" style="flex:1.15"><div class="tag">Recompensa LAB</div>(VWAP − precio)<br>/ VWAP si compra;<br>0 si espera</div>
+    <div class="arrow">→</div>
+    <div class="box g" style="flex:1.75"><div class="tag">Double DQN (PyTorch)</div>act → step → memoria → learn<br>red 2-64-64-2 · buffer 50.000<br>ε 1 → 0,02 · 4.000 episodios</div>
+  </div>
+  <img class="fig" src="figs/01_ej1.png" alt="Episodio, 27 órdenes y validación del Ej. 1">
+  <div class="row" style="margin-top:2mm; gap:2mm">
+    <div class="kpi ok"><div class="l">Órdenes completas</div><div class="v">27/27</div><div class="n">en train y en test</div></div>
+    <div class="kpi bad"><div class="l">Plazo consumido</div><div class="v">21 %</div><div class="n">TWAP: 98 %</div></div>
+    <div class="kpi bad"><div class="l">Error frente al plan</div><div class="v">39,4</div><div class="n">títulos · TWAP: 0,90</div></div>
+    <div class="kpi bad"><div class="l">Slippage vs VWAP</div><div class="v">−4,67 pb</div><div class="n">TWAP: −1,77 pb</div></div>
+    <div class="verdict warn" style="flex:2.4; font-size:10pt; line-height:1.22"><b>Por qué.</b> La recompensa compara cada compra con el VWAP de todo el episodio, que [T, V] no deja anticipar, y no premia repartir: la política oscila entre comprar todo y no comprar nada.</div>
+  </div>
+<div class="foot">RL para ejecución de órdenes · Romero, Dapena y García · MIAX · github.com/Romequinco/rl-execution-agents</div><div class="num">2</div></section>
+<section class="slide">
+  <div class="kicker">Ejercicio 2 · Un TWAP aprendido por recompensas</div>
+  <h1>Con una recompensa de seguimiento y cierre, el agente es un TWAP</h1>
+  <div class="row" style="gap:4mm; flex:1; min-height:0">
+    <div class="col" style="width:82mm; justify-content:space-between">
+      <div class="box o" style="font-size:10pt">
+        <div class="tag">Mismo estado [T, V] · nueva recompensa</div>
+        <div class="f" style="font-size:12.5pt; text-align:center; margin:0.5mm 0 1mm">r<sub>t</sub> = − mín( | e<sub>t</sub> − t·n/N | , c ) / c</div>
+        <b>Estado:</b> el TWAP es la diagonal V = T; [T, V] basta para predecir la recompensa.<br>
+        <b>Seguimiento:</b> distancia al plan en cada paso.<br>
+        <b>Cierre:</b> si acaba antes de N, cobra los pasos que faltan; sin él, acabar pronto apaga el castigo.
+      </div>
+      <div>
+        <table style="font-size:10pt">
+          <thead><tr><th>Política fija</th><th>LAB</th><th style="white-space:nowrap">Sin cierre</th><th style="white-space:nowrap">Con cierre</th></tr></thead>
+          <tbody>
+            <tr><td style="white-space:nowrap">TWAP</td><td>−0,009</td><td class="win">−43,0</td><td class="win">−43,7</td></tr>
+            <tr><td style="white-space:nowrap">Todo al principio</td><td>−0,013</td><td class="near">−47,6</td><td>−471,0</td></tr>
+            <tr><td style="white-space:nowrap">Todo al final</td><td class="win">+0,020</td><td>−471,0</td><td>−471,0</td></tr>
+            <tr><td style="white-space:nowrap">Aleatoria</td><td>−0,011</td><td>−254,9</td><td>−272,5</td></tr>
+          </tbody>
+        </table>
+        <p class="cap">Retorno medio en las 27 órdenes (c = 5). Sin cierre, «todo al principio» casi empata con el TWAP.</p>
+      </div>
+    </div>
+    <div class="col" style="flex:1; justify-content:space-between">
+      <img class="fig" src="figs/02_ej2.png" alt="Trayectorias, política y entrenamiento del Ej. 2">
+      <div class="row" style="gap:2mm">
+        <div class="kpi ok"><div class="l">Error frente al plan</div><div class="v">0,90 <small>= TWAP</small></div><div class="n">títulos; peor orden: 0,93</div></div>
+        <div class="kpi ok"><div class="l">Órdenes completas</div><div class="v">27/27</div><div class="n">3 días × 3 plazos × 3 tamaños</div></div>
+        <div class="kpi ok"><div class="l">Intervalo entre compras</div><div class="v">1,01 <small>± 0,07</small></div><div class="n">× N/n; TWAP perfecto = 1</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="tag" style="margin-top:2.5mm">Parametría · motivada a priori y contrastada con barridos de 3 semillas · error en títulos, antes → después</div>
+  <div class="row" style="gap:2mm; font-size:9.2pt; line-height:1.2">
+    <div class="box par"><b>γ: 0,99 → 0,9</b><div class="pv"><s>4,57</s> → 0,91</div>horizonte ≈ 10 pasos, la separación entre compras</div>
+    <div class="box par"><b>Cierre: no → sí</b><div class="pv"><s>8,16</s> → 4,57 <small>(γ 0,99)</small></div>sin él acaba al 17 % del tiempo</div>
+    <div class="box par"><b>Recorte c: 5 → 20</b><div class="pv"><s>3,04</s> → 0,91</div>con c pequeño no sabe cómo volver al plan</div>
+    <div class="box par"><b>Aprender cada 64 → 8</b><div class="pv"><s>6,29</s> → 0,91</div>pasos: 8 veces más actualizaciones</div>
+    <div class="box par"><b>Buffer: 50.000 → 10.000</b><div class="pv"><s>0,91</s> → 0,90</div>olvida antes el llenado aleatorio inicial</div>
+  </div>
+<div class="foot">RL para ejecución de órdenes · Romero, Dapena y García · MIAX · github.com/Romequinco/rl-execution-agents</div><div class="num">3</div></section>
+<section class="slide">
+  <div class="kicker">Ejercicio 3 · Explorar según la mejora, no según el número de episodios</div>
+  <h1>ε baja cuando el agente mejora y vuelve a subir si empeora</h1>
+  <div class="row" style="gap:4mm; flex:1; min-height:0">
+    <div class="col" style="width:80mm; font-size:10pt; justify-content:space-between">
+      <div class="box">
+        <div class="tag">1 · ¿Cómo sabemos que ha mejorado?</div>
+        Cada 25 episodios, <b>examen sin exploración</b> sobre las 27 órdenes fijas: <b>E</b> = error frente al plan TWAP.<br>
+        <span class="note">La recompensa de entrenamiento no vale: sube porque baja ε (correlación −0,85).</span>
+      </div>
+      <div class="box o">
+        <div class="tag">2 · ¿Cómo lo trasladamos a ε?</div>
+        <div class="f" style="font-size:11.5pt; text-align:center; margin:0.5mm 0">p = (ln E<sub>0</sub> − ln E) / (ln E<sub>0</sub> − ln E*)</div>
+        <div class="f" style="font-size:11.5pt; text-align:center; margin:0 0 1mm">ε = 1 − 0,95 · p<sub>mejor</sub></div>
+        E<sub>0</sub> = 49,89 (no comprar) · E* = 0,90 (TWAP).<br>
+        Si p cae más de 0,1 en dos exámenes seguidos, <b>ε vuelve a subir</b>.
+      </div>
+      <div class="box g">
+        <div class="tag">3 · ¿Cómo lo comprobamos?</div>
+        Solo cambia ε; 3 semillas, 300 episodios.<br>
+        <b>A · estable:</b> configuración final del ej. 2.<br>
+        <b>B · inestable:</b> la de partida (sin cierre, c = 5, buffer 50.000).
+      </div>
+      <div class="verdict warn" style="font-size:10pt; line-height:1.22"><b>Cautela.</b> Son 3 semillas: en B el ε lineal falla en una (15,1 títulos) y acierta en dos.</div>
+    </div>
+    <div class="col" style="flex:1; justify-content:space-between">
+      <img class="fig" src="figs/03_ej3.png" alt="E y ε en el escenario inestable y comparación de 3 semillas">
+      <div class="row" style="gap:2mm">
+        <div class="kpi ok"><div class="l">B · error final</div><div class="v">0,96 <small>vs 5,65</small></div><div class="n">ε por mejora vs ε lineal</div></div>
+        <div class="kpi ok"><div class="l">B · error acumulado</div><div class="v">−38 %</div><div class="n">área bajo la curva de E</div></div>
+        <div class="kpi o"><div class="l">A · error final</div><div class="v">0,96 <small>vs 0,90</small></div><div class="n">sin ganancia: ya era estable</div></div>
+      </div>
+    </div>
+  </div>
+<div class="foot">RL para ejecución de órdenes · Romero, Dapena y García · MIAX · github.com/Romequinco/rl-execution-agents</div><div class="num">4</div></section>
+<section class="slide">
+  <div class="kicker">Ejercicio 4 · Mejoras del entorno y del entrenamiento</div>
+  <h1>Acabar al 90 %, parar antes de tiempo y mirar el mercado</h1>
+  <div class="row" style="gap:3mm; flex:1; min-height:0">
+    <div class="box o col idea">
+      <div class="tag">Idea B · Acabar al 90 % sin dejar volumen</div>
+      <div class="que">Plan que termina en 0,9·N y castigo final −k · pendiente / n.</div>
+      <img class="fig" src="figs/04_ej4_B.png" alt="Cuándo termina cada orden">
+      <div class="res"><div class="v">88,7 %</div><div class="note">del tiempo · 100 % completas y en banda, también en test</div></div>
+      <div>Lo decide el plan, no k. Con γ 0,995 y k = 10 solo completa el 33 %: demasiado castigo es peor que ninguno.</div>
+    </div>
+    <div class="box g col idea">
+      <div class="tag">Idea C · Parar a tiempo y reanudar</div>
+      <div class="que">Examen cada 25 episodios; para por objetivo (E&nbsp;≤&nbsp;1,5 dos veces), estancamiento o tope.</div>
+      <img class="fig" src="figs/04_ej4_C.png" alt="Parada por objetivo en 5 semillas">
+      <div class="res"><div class="v">130 <small>de 300</small></div><div class="note">episodios de media · error 0,92 frente a 0,89 sin parar</div></div>
+      <div>El checkpoint guarda red, optimizador, memoria y azar: al reanudar, <b>curvas y pesos idénticos</b>.</div>
+    </div>
+    <div class="box col idea">
+      <div class="tag">Idea A · Mirar el mercado y pagar menos</div>
+      <div class="que">Estado + spread, desbalanceo, tendencia y actividad (solo pasado); castigo por el medio spread pagado.</div>
+      <img class="fig" src="figs/04_ej4_A.png" alt="Ahorro en test frente al TWAP al 90 %">
+      <div class="res"><div class="v">+0,15 pb</div><div class="note">por orden frente al TWAP al 90 % · placebo: −0,02</div></div>
+      <div>La mejora viene de la información. La regla simple ahorra más (+0,34), pero con casi el triple de dispersión.</div>
+    </div>
+  </div>
+  <div class="row" style="gap:3mm; margin-top:2.5mm; font-size:9.8pt; line-height:1.22">
+    <div class="verdict warn" style="flex:1; font-size:9.8pt"><b>Extra · Pasillo 80-95 %.</b> Sin castigo dentro del pasillo, cada semilla elige su punto (80 % a 92 %), pero una se sale de la banda en más de la mitad de las órdenes: nos quedamos con el plan fijo.</div>
+    <div class="verdict" style="flex:1; font-size:9.8pt"><b>Extra · Robustez.</b> Órdenes nunca vistas (250-800 pasos, 4-20 % del volumen) y sin poder comprar hasta el 60 % inicial: <b>100 % completas y dentro de la banda</b>, como el TWAP.</div>
+  </div>
+<div class="foot">RL para ejecución de órdenes · Romero, Dapena y García · MIAX · github.com/Romequinco/rl-execution-agents</div><div class="num">5</div></section>
+<section class="slide">
+  <div class="kicker">Conclusiones</div>
+  <h1>La recompensa decide el comportamiento; el mercado añade poco</h1>
+  <div class="row" style="gap:2.5mm; margin-bottom:3mm">
+    <div class="kpi bad"><div class="l">Ej. 1 · Recompensa del LAB</div><div class="v">21 %</div><div class="n">del plazo: compra todo al principio</div></div>
+    <div class="kpi ok"><div class="l">Ej. 2 · Seguimiento + cierre</div><div class="v">0,90 <small>= TWAP</small></div><div class="n">títulos de error; 27/27 órdenes completas</div></div>
+    <div class="kpi ok"><div class="l">Ej. 3 · ε por mejora</div><div class="v">0,96 <small>vs 5,65</small></div><div class="n">error final en el entrenamiento inestable</div></div>
+    <div class="kpi ok"><div class="l">Ej. 4 · Ideas B y C</div><div class="v">88,7 % <small>· 130 ep.</small></div><div class="n">acaba en banda; para antes de los 300</div></div>
+    <div class="kpi o"><div class="l">Ej. 4 · Idea A</div><div class="v">+0,15 pb</div><div class="n">de ahorro frente al TWAP; placebo: −0,02</div></div>
+  </div>
+  <div class="row" style="gap:6mm; flex:1; min-height:0">
+    <div class="col" style="width:104mm; justify-content:center">
+      <img class="fig" src="figs/05_resumen.png" alt="Error frente al plan por recompensa">
+    </div>
+    <div class="col" style="flex:1; font-size:11.5pt; line-height:1.28; justify-content:space-between">
+      <div>
+        <div class="tag" style="font-size:10pt">Mensajes clave</div>
+        <ul>
+          <li>Con el mismo estado y la misma red, <b>cambiar la recompensa</b> lleva de comprar todo de golpe a replicar el TWAP.</li>
+          <li>El <b>cierre</b> y un γ corto son lo que evita el atajo de acabar pronto.</li>
+          <li>Un <b>examen fijo sin exploración</b> sirve para tres cosas: elegir modelo, gobernar ε y decidir cuándo parar.</li>
+          <li>Mirar el mercado da una mejora <b>real pero pequeña</b>; una regla simple compite con el agente.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="tag" style="font-size:10pt; color:#888">Limitaciones y trabajo futuro</div>
+        <ul style="color:#333">
+          <li>Pocas semillas (3 a 5): harían falta más para afirmar las diferencias pequeñas.</li>
+          <li>Simulador sin impacto ni latencia, y solo Repsol.</li>
+          <li>Siguiente paso: libro a 3 niveles y órdenes de tamaño variable.</li>
+        </ul>
+      </div>
+      <p style="text-align:right; font-size:15pt; color:#102a43; margin:0">Preguntas</p>
+    </div>
+  </div>
+<div class="foot">RL para ejecución de órdenes · Romero, Dapena y García · MIAX · github.com/Romequinco/rl-execution-agents</div><div class="num">6</div></section>
+</body></html>
