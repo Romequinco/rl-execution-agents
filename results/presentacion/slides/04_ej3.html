@@ -1,0 +1,16 @@
+<section class="slide">
+  <div class="tema">Ejercicio 3. Explorar según lo aprendido, no según el número de episodios</div>
+  <h1>La exploración baja cuando el agente mejora y sube si empeora</h1>
+  <div class="cuerpo">
+    <img class="fig" src="figs/03_ej3.png" alt="Error en el examen y exploración a lo largo de un entrenamiento inestable">
+    <div class="txt">
+      <p>Cada 25 episodios el agente pasa un examen sin explorar sobre las mismas 27 órdenes. Cuanto más se acerca su error al de un TWAP, menos actúa al azar.</p>
+      <p class="gris">ε = 1 − 0,95 · p, donde p es el progreso hacia el TWAP (anexo B).</p>
+      <div class="nums">
+        <div class="n">0,96 <small>frente a 5,65</small></div><div class="d">títulos de error final en el entrenamiento inestable (3 repeticiones; la del LAB falla en una).</div>
+        <div class="n">−38 %</div><div class="d">de error acumulado mientras entrena.</div>
+        <div class="n">0,96 <small>frente a 0,90</small></div><div class="d">si ya era estable: ahí no se gana nada.</div>
+      </div>
+    </div>
+  </div>
+</section>

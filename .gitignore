@@ -245,3 +245,6 @@ docs/raw/26 11 06.pdf
 docs/raw/26 11 07.pdf
 docs/raw/MIAX14/applying_RL_MIAX.pdf
 docs/raw/MIAX14/casos_practicos.pdf
+
+# HTML intermedio de la presentación (lo regenera build.py)
+results/presentacion/presentacion.html

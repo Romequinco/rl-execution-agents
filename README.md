@@ -2,9 +2,9 @@
 
 # RL Execution Agents
 
-**Aprendizaje por refuerzo para ejecutar una orden CARE de compra sobre el libro de órdenes de Santander y Repsol**
+**Aprendizaje por refuerzo para ejecutar una orden CARE de compra sobre el libro de órdenes de Repsol**
 
-![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-CPU-EE4C2C?logo=pytorch&logoColor=white)
 ![Tests](https://img.shields.io/badge/tests-unittest-2F9E6E)
 ![Jupyter](https://img.shields.io/badge/Jupyter-notebooks-F37626?logo=jupyter&logoColor=white)
@@ -18,6 +18,8 @@ Máster MIAX · Aprendizaje por Refuerzo · Taller 3 · Noviembre 2026<br>
 </div>
 
 ---
+
+![Portada de la presentación: precio de Repsol durante una orden y cuándo compra cada agente](results/presentacion/png/diapo_01.png)
 
 ## El problema
 
@@ -40,6 +42,20 @@ El Ej. 1 ocupa los huecos del propio LAB; los ejercicios 2, 3 y 4 van detrás, c
 qué hacemos y qué sale, figuras y una conclusión. Cada bloque que cambia respecto al LAB lleva la marca
 `🔧 Bloque modificado · Ej. N`. Se ejecuta entero en unos 3 minutos: el Ej. 1 entrena en directo y los demás leen
 `results/`. No escribe nada en el repositorio.
+
+## Presentación
+
+**[`results/presentacion/presentacion.pdf`](results/presentacion/presentacion.pdf)**: 6 diapositivas, una por ejercicio más portada y
+conclusiones, y 5 de anexo con el detalle (parámetros del Ej. 2, las tres repeticiones del Ej. 3, pasillo y robustez).
+Cada diapositiva es un fragmento HTML en `slides/` y las figuras salen de `results/`:
+
+```bash
+python results/presentacion/figuras.py
+python results/presentacion/build.py --png
+```
+
+`ej1_cache.py` reentrena el agente del Ej. 1 igual que el notebook de entrega (unos 2 minutos) y guarda en `cache/` lo
+que necesitan sus figuras; solo hace falta volver a lanzarlo si cambia el entrenamiento.
 
 ## Notebooks de detalle
 
@@ -77,6 +93,7 @@ por ese orden. `models/ej1_ddqn.pt` corresponde al seleccionado; test solo se ev
 |---|---|
 | `docs/raw/` | Material del taller: `MIAX14/` con el enunciado, `rl-material` y el repo `best-execution` con los datos. Las transcripciones de las clases del 6 y 7 de noviembre (`26 11 06.pdf`, `26 11 07.pdf`) y las diapositivas (`applying_RL_MIAX.pdf`, `casos_practicos.pdf`) se citan en `docs/teoria` pero no se publican: se quedan en local por privacidad y derechos |
 | `docs/raw/MIAX14/best-execution/` | Repo del taller ([Oteo95/best-execution](https://github.com/Oteo95/best-execution), LGPL-2.1): `workshop/execution_lab.ipynb` y `data/*.pkl` |
+| `results/presentacion/` | Presentación: `presentacion.pdf`, las diapositivas en `slides/`, sus figuras en `figs/` y los scripts que la generan |
 | `docs/raw/referencias/` | Copia de los Talleres 1 y 2 tal como están en GitHub, como referencia de estructura y decisiones |
 
 ## Síntesis del material (`docs/teoria/`)
@@ -106,6 +123,10 @@ Empezad por [`notebook_partida.md`](docs/teoria/notebook_partida.md).
 Medidos sobre 27 órdenes fijas de Repsol, salvo que se indique otra cosa. El «error» es cuántos títulos se separa el
 agente, como máximo, del plan que debe seguir; cuanto menor, mejor.
 
+| Con la recompensa del taller | Con la nuestra |
+|---|---|
+| ![Ejercicio 1: el agente compra todo al principio](results/presentacion/png/diapo_02.png) | ![Ejercicio 2: el agente reparte la orden como un TWAP](results/presentacion/png/diapo_03.png) |
+
 | Ejercicio | Resultado |
 |---|---|
 | Referencia | El TWAP completa todas las órdenes y acaba al 98 % del tiempo, con un error de 0,90 |
@@ -116,6 +137,8 @@ agente, como máximo, del plan que debe seguir; cuanto menor, mejor.
 | 4 · C | Para solo al cumplir el objetivo (100-150 episodios en vez de 300) con casi el mismo error (0,92 frente a 0,89); se puede cortar y seguir exactamente igual |
 | 4 · A | Mirando el mercado ahorra **+0,15 pb** por orden frente al TWAP al 90 %; un placebo con datos desordenados no ahorra nada. Una regla simple ahorra más (+0,34) pero es casi tres veces más irregular |
 | 4 · extras | Un pasillo 80-95 % en vez de plan fijo da libertad pero menos estabilidad. El agente no falla con órdenes que nunca vio ni empezando tarde |
+
+![Ejercicio 4: acabar al 90 % del plazo, parar a tiempo y mirar el mercado](results/presentacion/png/diapo_05.png)
 
 ## Licencia
 

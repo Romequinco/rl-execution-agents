@@ -1,0 +1,15 @@
+<section class="slide">
+  <div class="tema">Anexo D. Ejercicio 4, robustez</div>
+  <h1 style="min-height:0; margin-bottom:6mm">Con órdenes que no ha visto, las completa dentro de la banda</h1>
+  <table style="font-size:13pt">
+    <thead><tr><th>Prueba, sin volver a entrenar</th><th>Órdenes</th><th>Completas</th><th>En banda</th><th>Acaba al</th><th>TWAP al 90 %</th></tr></thead>
+    <tbody>
+      <tr><td>Duraciones y tamaños fuera del rango entrenado</td><td>240</td><td class="c">100 %</td><td class="c">100 %</td><td>87,6 %</td><td>87,1 %</td></tr>
+      <tr><td>Sin poder comprar durante el 20 % inicial</td><td>135</td><td class="c">100 %</td><td class="c">100 %</td><td>88,7 %</td><td>88,3 %</td></tr>
+      <tr><td>Sin poder comprar durante el 40 % inicial</td><td>135</td><td class="c">100 %</td><td class="c">100 %</td><td>88,7 %</td><td>88,3 %</td></tr>
+      <tr><td>Sin poder comprar durante el 60 % inicial</td><td>135</td><td class="c">100 %</td><td class="c">100 %</td><td>88,7 %</td><td>88,3 %</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12pt; line-height:1.35; margin-top:7mm; width:190mm">Se entrenó con órdenes de 400 a 600 pasos y del 7,5 al 12,5 % de los pasos; aquí se prueban de 250 a 800 pasos y del 4 al 20 %. Como el estado es el tiempo y el volumen que quedan en tanto por uno, la regla aprendida sirve para otros tamaños, y tras un retraso recupera lo perdido.</p>
+  <p class="gris" style="margin-top:3mm">Banda: acabar entre el 80 y el 95 % del plazo. Cinco repeticiones del entrenamiento.</p>
+</section>
