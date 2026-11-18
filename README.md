@@ -40,7 +40,7 @@ Aprende con aprendizaje por refuerzo (Double DQN) sobre datos reales del libro d
 taller completado, con los cuatro ejercicios en un solo sitio y ya ejecutado. Conserva intacto el texto del profesor.
 El Ej. 1 ocupa los huecos del propio LAB; los ejercicios 2, 3 y 4 van detrás, cada uno con una tabla de qué se pide,
 qué hacemos y qué sale, figuras y una conclusión. Cada bloque que cambia respecto al LAB lleva la marca
-`🔧 Bloque modificado · Ej. N`. Se ejecuta entero en unos 3 minutos: el Ej. 1 entrena en directo y los demás leen
+`Bloque modificado · Ej. N`. Se ejecuta entero en unos 3 minutos: el Ej. 1 entrena en directo y los demás leen
 `results/`. No escribe nada en el repositorio.
 
 ## Presentación
