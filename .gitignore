@@ -222,9 +222,9 @@ __marimo__/
 # ---------------------------------------------------------------
 # Proyecto rl-execution-agents
 # ---------------------------------------------------------------
-# docs/raw/ se versiona (salvo transcripciones y diapositivas, al final): material del taller (enunciado,
-# teoría, repo best-execution con sus datos .pkl) y copias de los Talleres 1 y 2.
-# Se añadió con `git add -f docs/raw` para saltarse los .gitignore que trae dentro.
+# Material de clase: solo en local, nunca se versiona (enunciado, transcripciones, diapositivas,
+# repo best-execution con sus datos y copias de los Talleres 1 y 2)
+docs/raw/
 
 # Notebooks personales de prueba
 notebooks/scratch_*.ipynb
@@ -232,19 +232,12 @@ notebooks/scratch_*.ipynb
 # Caché de entrenamientos (se regenera)
 results/cache/
 
-# Objetos serializados intermedios (salvo los datos del taller en docs/raw)
+# Objetos serializados intermedios
 *.npy
 *.npz
 *.pkl
-!docs/raw/**/*.pkl
 
 .DS_Store
-
-# Transcripciones de clase y diapositivas del profesor: solo en local (privacidad y derechos)
-docs/raw/26 11 06.pdf
-docs/raw/26 11 07.pdf
-docs/raw/MIAX14/applying_RL_MIAX.pdf
-docs/raw/MIAX14/casos_practicos.pdf
 
 # HTML intermedio de la presentación (lo regenera build.py)
 results/presentacion/presentacion.html

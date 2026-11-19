@@ -1,9 +1,0 @@
-numpy
-pandas
-matplotlib
-gymnasium
-torch
-tqdm
-jupyter
-markdown
-pymupdf

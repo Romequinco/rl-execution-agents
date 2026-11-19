@@ -91,10 +91,9 @@ por ese orden. `models/ej1_ddqn.pt` corresponde al seleccionado; test solo se ev
 
 | Carpeta | Contenido |
 |---|---|
-| `docs/raw/` | Material del taller: `MIAX14/` con el enunciado, `rl-material` y el repo `best-execution` con los datos. Las transcripciones de las clases del 6 y 7 de noviembre (`26 11 06.pdf`, `26 11 07.pdf`) y las diapositivas (`applying_RL_MIAX.pdf`, `casos_practicos.pdf`) se citan en `docs/teoria` pero no se publican: se quedan en local por privacidad y derechos |
-| `docs/raw/MIAX14/best-execution/` | Repo del taller ([Oteo95/best-execution](https://github.com/Oteo95/best-execution), LGPL-2.1): `workshop/execution_lab.ipynb` y `data/*.pkl` |
+| `docs/raw/` | Material del taller, **solo en local y no versionado** (privacidad y derechos): enunciado, transcripciones, diapositivas, `rl-material` y el repo `best-execution` con los datos. Se cita en `docs/teoria` |
+| `docs/raw/MIAX14/best-execution/` | Repo del taller ([Oteo95/best-execution](https://github.com/Oteo95/best-execution), LGPL-2.1), con `data/new_version/*.pkl`. Para ejecutar los notebooks: `git clone https://github.com/Oteo95/best-execution docs/raw/MIAX14/best-execution` |
 | `results/presentacion/` | Presentación: `presentacion.pdf`, las diapositivas en `slides/`, sus figuras en `figs/` y los scripts que la generan |
-| `docs/raw/referencias/` | Copia de los Talleres 1 y 2 tal como están en GitHub, como referencia de estructura y decisiones |
 
 ## Síntesis del material (`docs/teoria/`)
 
